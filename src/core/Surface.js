@@ -448,12 +448,14 @@ define(function(require, exports, module) {
      * @param {Node} target document parent of this container
      */
     Surface.prototype.deploy = function deploy(target) {
-        var content = this.getContent();
-        if (content instanceof Node) {
-            while (target.hasChildNodes()) target.removeChild(target.firstChild);
-            target.appendChild(content);
-        }
-        else target.innerHTML = content;
+      var content = this.getContent();
+      if (content instanceof Node) {
+        while (target.hasChildNodes())
+          target.removeChild(target.firstChild);
+        target.appendChild(content);
+      } else
+        target.innerHTML = content;
+      this.content = target.innerHTML;
     };
 
     /**

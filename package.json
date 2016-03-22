@@ -107,6 +107,11 @@
     "url": "https://github.com/famous/famous/issues"
   },
   "homepage": "https://famo.us",
+  "jspm": {
+    "directories": {
+      "lib": "src"
+    }
+  },
   "devDependencies": {
     "eslint": "^0.16.2",
     "famous-dist-generator": "^1.0.2",

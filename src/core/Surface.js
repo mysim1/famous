@@ -458,18 +458,25 @@ define(function(require, exports, module) {
       this.content = target.innerHTML;
     };
 
-    /**
-     * Remove any contained document content associated with this surface
-     *   from the actual document.
-     *
-     * @private
-     * @method recall
-     */
-    Surface.prototype.recall = function recall(target) {
-        var df = document.createDocumentFragment();
-        while (target.hasChildNodes()) df.appendChild(target.firstChild);
-        this.setContent(df);
-    };
+      /**
+       * FIX for famous-bug: https://github.com/Famous/famous/issues/673
+       *
+       * There is a bug in recall which causes the latest setContent()
+       * call to be ignored, if the element is removed from the DOM in
+       * the next render-cycle.
+       */
+      Surface.prototype.recall = function recall(target) {
+        if (!this._contentDirty) {
+          var df = document.createDocumentFragment();
+          while (target.hasChildNodes()) {
+            df.appendChild(target.firstChild);
+          }
+          this.setContent(df);
+        }
+        else {
+          this._contentDirty = true;
+        }
+      };
 
     /**
      *  Get the x and y dimensions of the surface.

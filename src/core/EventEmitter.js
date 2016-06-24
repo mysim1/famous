@@ -8,6 +8,7 @@
  */
 
 define(function(require, exports, module) {
+
   /**
    * EventEmitter represents a channel for events.
    *
@@ -26,14 +27,22 @@ define(function(require, exports, module) {
    * @method emit
    *
    * @param {string} type event type key (for example, 'click')
-   * @param {Object} event event data
+   * @param {Objects} event event data
+   * @param {Objects}(opt) event event data
+   * @param {Objects}(opt) event event data
+   * @param {Objects}(opt) event event data
    * @return {EventHandler} this
    */
-  EventEmitter.prototype.emit = function emit(type, event) {
+  EventEmitter.prototype.emit = function emit() {
+    var type = arguments[0];
+    var args = [];
+    for(var i=1;i<arguments.length;i++){
+      args.push(arguments[i]);
+    }
     var handlers = this.listeners[type];
     if (handlers) {
       for (var i = 0; i < handlers.length; i++) {
-        handlers[i].call(this._owner, event);
+        handlers[i].apply(this._owner, args);
       }
     }
     return this;

@@ -135,7 +135,11 @@ define(function(require, exports, module) {
     function initialize() {
         // prevent scrolling via browser
         window.addEventListener('touchmove', function(event) {
-            event.preventDefault();
+            if(event.target.tagName === 'TEXTAREA'){
+                return true;
+            } else {
+                event.preventDefault();
+            }
         }, true);
 
         addRootClasses();

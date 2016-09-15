@@ -95,8 +95,8 @@ define(function(require, exports, module) {
     var newPositionX = lastOffset[0] + tx;
     if(rangeX && !outsideTouches && (newPositionX > rangeX[1] || newPositionX < rangeX[0])) {
       var overX = (newPositionX - rangeX[1]);
-      var underY = (newPositionX - rangeX[0]);
-      tx = _clamp(tx, [tx - underY, tx - overX]);
+      var underX = (newPositionX - rangeX[0]);
+      tx = _clamp(tx, [tx - underX, tx - overX]);
     }
     var newPositionY = lastOffset[0] + ty;
     if(rangeY && !outsideTouches && (newPositionY > rangeY[1] || newPositionY < rangeY[0])) {

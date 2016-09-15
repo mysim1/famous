@@ -28,6 +28,7 @@ define(function(require, exports, module) {
    * @param {Number} [options.snapY] grid height for snapping during drag
    * @param {Array.Number} [options.xRange] maxmimum [negative, positive] x displacement from start of drag
    * @param {Array.Number} [options.yRange] maxmimum [negative, positive] y displacement from start of drag
+   * @param {Boolean} [options.outsideTouches] When set to false, touch events outside xRange and yRange are ignored. Defaults to true
    * @param {Number} [options.scale] one pixel of input motion translates to this many pixels of output drag motion
    * @param {Number} [options.projection] User should set to Draggable._direction.x or
    *    Draggable._direction.y to constrain to one axis.
@@ -40,6 +41,7 @@ define(function(require, exports, module) {
 
     this._positionState = new Transitionable([0,0]);
     this._differential  = [0,0];
+    this._lastTouchOffset = [0,0];
 
     this._active = true;
     this.eventOutput = new EventHandler();
@@ -67,6 +69,7 @@ define(function(require, exports, module) {
     yRange      : null,
     snapX       : 0,
     snapY       : 0,
+    outsideTouches: true,
     transition  : {duration : 0}
   };
 
@@ -75,6 +78,10 @@ define(function(require, exports, module) {
     var projection  = opts.projection;
     var snapX       = opts.snapX;
     var snapY       = opts.snapY;
+    var rangeX      = opts.xRange;
+    var rangeY      = opts.yRange;
+    var outsideTouches = opts.outsideTouches;
+    var lastOffset  = this._lastTouchOffset;
 
     //axes
     var tx = (projection & _direction.x) ? differential[0] : 0;
@@ -84,12 +91,30 @@ define(function(require, exports, module) {
     if (snapX > 0) tx -= tx % snapX;
     if (snapY > 0) ty -= ty % snapY;
 
+    //ignore touches that happen outside of the xRange and yRange areas
+    var newPositionX = lastOffset[0] + tx;
+    if(rangeX && !outsideTouches && (newPositionX > rangeX[1] || newPositionX < rangeX[0])) {
+      var overX = (newPositionX - rangeX[1]);
+      var underY = (newPositionX - rangeX[0]);
+      tx = _clamp(tx, [tx - underY, tx - overX]);
+    }
+    var newPositionY = lastOffset[0] + ty;
+    if(rangeY && !outsideTouches && (newPositionY > rangeY[1] || newPositionY < rangeY[0])) {
+      var overY = (newPositionY - rangeY[1]);
+      var underY = (newPositionY - rangeY[0]);
+      tx = _clamp(ty, [ty - underY, ty - overY]);
+    }
+
+    lastOffset[0] += tx;
+    lastOffset[1] += ty;
+
     return [tx, ty];
   }
 
   function _handleStart() {
     if (!this._active) return;
     if (this._positionState.isActive()) this._positionState.halt();
+    this._lastTouchOffset = [this.getPosition()[0], this.getPosition()[1]];
     this.eventOutput.emit('start', {position : this.getPosition()});
   }
 

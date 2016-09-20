@@ -35,7 +35,7 @@ define(function(require, exports, module) {
    */
   function Draggable(options) {
     this.options = Object.create(Draggable.DEFAULT_OPTIONS);
-    this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
+    this.sync = new GenericSync('ontouchstart' in document.documentElement ? ['touch'] : ['mouse', 'touch'], {scale : this.options.scale});
     if (options) this.setOptions(options);
 
     this._positionState = new Transitionable([0,0]);

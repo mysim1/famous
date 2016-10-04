@@ -77,6 +77,9 @@ define(function(require, exports, module) {
         var currentTime = Date.now();
 
         var timeDiff = currentTime - lastTime;
+        if(window.extraDelay){
+            pauseComputer(window.extraDelay);
+        }
         if(window.doPerformanceTesting){
             if(window.avgTimeDiff === undefined){
                 window.avgTimeDiff = 0;
@@ -137,6 +140,14 @@ define(function(require, exports, module) {
     }
     window.addEventListener('resize', handleResize, false);
     handleResize();
+
+    function pauseComputer(millis)
+    {
+        var date = new Date();
+        var curDate = null;
+        do { curDate = new Date(); }
+        while(curDate-date < millis);
+    }
 
     /**
      * Initialize famous for app mode

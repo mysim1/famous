@@ -76,6 +76,19 @@ define(function(require, exports, module) {
 
         var currentTime = Date.now();
 
+        var timeDiff = currentTime - lastTime;
+        if(window.doPerformanceTesting){
+            if(window.avgTimeDiff === undefined){
+                window.avgTimeDiff = 0;
+                window.startAtFrame = currentFrame;
+            } else {
+                var currentMeasuringFrame = currentFrame - window.startAtFrame;
+                window.avgTimeDiff = (window.avgTimeDiff * (currentMeasuringFrame - 1) + timeDiff)/currentMeasuringFrame;
+                window.avgFrameRate = 1000 / window.avgTimeDiff;
+            }
+        }
+
+
         // skip frame if we're over our framerate cap
         if (frameTimeLimit && currentTime - lastTime < frameTimeLimit) return;
 

@@ -11,7 +11,7 @@ define(function(require, exports, module) {
      *   Private.
      *
      * @private
-     * @class NativeScrllGroup
+     * @class NativeScorllGroup
      * @extends Group
      * @constructor
      * @param {Object} [options] Surface options array (see Surface})
@@ -20,6 +20,13 @@ define(function(require, exports, module) {
         Group.call(this, options);
     }
     NativeScrollGroup.prototype = Object.create(Group.prototype);
+
+    NativeScrollGroup.prototype.commit = function commit(context) {
+        this._size = context.size;
+        Group.prototype.commit.apply(this, arguments);
+    };
+
+
     NativeScrollGroup.prototype.elementClass = 'famous-native-scroller';
     module.exports = NativeScrollGroup;
 });

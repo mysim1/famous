@@ -7,398 +7,419 @@
  * @copyright Famous Industries, Inc. 2015
  */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
 
-    /**
-     * The singleton object initiated upon process
-     *   startup which manages all active Context instances, runs
-     *   the render dispatch loop, and acts as a listener and dispatcher
-     *   for events.  All methods are therefore static.
-     *
-     *   On static initialization, window.requestAnimationFrame is called with
-     *     the event loop function.
-     *
-     *   Note: Any window in which Engine runs will prevent default
-     *     scrolling behavior on the 'touchmove' event.
-     *
-     * @static
-     * @class Engine
-     */
-    var Context = require('./Context');
-    var EventHandler = require('./EventHandler');
-    var OptionsManager = require('./OptionsManager');
+  /**
+   * The singleton object initiated upon process
+   *   startup which manages all active Context instances, runs
+   *   the render dispatch loop, and acts as a listener and dispatcher
+   *   for events.  All methods are therefore static.
+   *
+   *   On static initialization, window.requestAnimationFrame is called with
+   *     the event loop function.
+   *
+   *   Note: Any window in which Engine runs will prevent default
+   *     scrolling behavior on the 'touchmove' event.
+   *
+   * @static
+   * @class Engine
+   */
+  var Context = require('./Context');
+  var EventHandler = require('./EventHandler');
+  var OptionsManager = require('./OptionsManager');
 
-    var Engine = {};
+  var Engine = {};
 
-    var contexts = [];
+  var contexts = [];
 
-    var nextTickQueue = [];
+  var nextTickQueue = [];
 
-    var currentFrame = 0;
-    var nextTickFrame = 0;
+  var currentFrame = 0;
+  var nextTickFrame = 0;
 
-    var deferQueue = [];
+  var deferQueue = [];
 
-    var lastTime = Date.now();
-    var frameTime;
-    var frameTimeLimit;
-    var loopEnabled = true;
-    var eventForwarders = {};
-    var eventHandler = new EventHandler();
+  var lastTime = Date.now();
+  var frameTime;
+  var frameTimeLimit;
+  var loopEnabled = true;
+  var eventForwarders = {};
+  var eventHandler = new EventHandler();
 
-    var options = {
-        containerType: 'div',
-        containerClass: 'famous-container',
-        fpsCap: undefined,
-        runLoop: true,
-        appMode: true
-    };
-    var optionsManager = new OptionsManager(options);
+  var options = {
+    containerType: 'div',
+    containerClass: 'famous-container',
+    fpsCap: undefined,
+    runLoop: true,
+    appMode: true
+  };
+  var optionsManager = new OptionsManager(options);
 
-    /** @const */
-    var MAX_DEFER_FRAME_TIME = 10;
+  /** @const */
+  var MAX_DEFER_FRAME_TIME = 10;
 
-    /**
-     * Inside requestAnimationFrame loop, step() is called, which:
-     *   calculates current FPS (throttling loop if it is over limit set in setFPSCap),
-     *   emits dataless 'prerender' event on start of loop,
-     *   calls in order any one-shot functions registered by nextTick on last loop,
-     *   calls Context.update on all Context objects registered,
-     *   and emits dataless 'postrender' event on end of loop.
-     *
-     * @static
-     * @private
-     * @method step
-     */
-    Engine.step = function step() {
-        currentFrame++;
-        nextTickFrame = currentFrame;
+  /**
+   * Inside requestAnimationFrame loop, step() is called, which:
+   *   calculates current FPS (throttling loop if it is over limit set in setFPSCap),
+   *   emits dataless 'prerender' event on start of loop,
+   *   calls in order any one-shot functions registered by nextTick on last loop,
+   *   calls Context.update on all Context objects registered,
+   *   and emits dataless 'postrender' event on end of loop.
+   *
+   * @static
+   * @private
+   * @method step
+   */
+  Engine.step = function step() {
+    currentFrame++;
+    nextTickFrame = currentFrame;
 
-        var currentTime = Date.now();
+    var currentTime = Date.now();
 
-        // skip frame if we're over our framerate cap
-        if (frameTimeLimit && currentTime - lastTime < frameTimeLimit) return;
+    // skip frame if we're over our framerate cap
+    if (frameTimeLimit && currentTime - lastTime < frameTimeLimit) return;
 
-        var i = 0;
+    var i = 0;
 
-        frameTime = currentTime - lastTime;
-        lastTime = currentTime;
+    frameTime = currentTime - lastTime;
+    lastTime = currentTime;
 
-        eventHandler.emit('prerender');
+    eventHandler.emit('prerender');
 
-        // empty the queue
-        var numFunctions = nextTickQueue.length;
-        while (numFunctions--) (nextTickQueue.shift())(currentFrame);
+    // empty the queue
+    var numFunctions = nextTickQueue.length;
+    while (numFunctions--) (nextTickQueue.shift())(currentFrame);
 
-        // limit total execution time for deferrable functions
-        while (deferQueue.length && (Date.now() - currentTime) < MAX_DEFER_FRAME_TIME) {
-            deferQueue.shift().call(this);
-        }
-
-        for (i = 0; i < contexts.length; i++) contexts[i].update();
-
-        eventHandler.emit('postrender');
-    };
-
-    // engage requestAnimationFrame
-    function loop() {
-        if (options.runLoop) {
-            Engine.step();
-            window.requestAnimationFrame(loop);
-        }
-        else loopEnabled = false;
-    }
-    window.requestAnimationFrame(loop);
-
-    //
-    // Upon main document window resize (unless on an "input" HTML element):
-    //   scroll to the top left corner of the window,
-    //   and for each managed Context: emit the 'resize' event and update its size.
-    // @param {Object=} event document event
-    //
-    function handleResize(event) {
-        for (var i = 0; i < contexts.length; i++) {
-            contexts[i].emit('resize');
-        }
-        eventHandler.emit('resize');
-    }
-    window.addEventListener('resize', handleResize, false);
-    handleResize();
-
-    /**
-     * Initialize famous for app mode
-     *
-     * @static
-     * @private
-     * @method initialize
-     */
-    function initialize() {
-        addRootClasses();
-    }
-    var initialized = false;
-
-    function addRootClasses() {
-        if (!document.body) {
-            Engine.nextTick(addRootClasses);
-            return;
-        }
-
-        document.body.classList.add('famous-root');
-        document.documentElement.classList.add('famous-root');
+    // limit total execution time for deferrable functions
+    while (deferQueue.length && (Date.now() - currentTime) < MAX_DEFER_FRAME_TIME) {
+      deferQueue.shift().call(this);
     }
 
-    /**
-     * Add event handler object to set of downstream handlers.
-     *
-     * @method pipe
-     *
-     * @param {EventHandler} target event handler target object
-     * @return {EventHandler} passed event handler
-     */
-    Engine.pipe = function pipe(target) {
-        if (target.subscribe instanceof Function) return target.subscribe(Engine);
-        else return eventHandler.pipe(target);
-    };
+    for (i = 0; i < contexts.length; i++) contexts[i].update();
 
-    /**
-     * Remove handler object from set of downstream handlers.
-     *   Undoes work of "pipe".
-     *
-     * @method unpipe
-     *
-     * @param {EventHandler} target target handler object
-     * @return {EventHandler} provided target
-     */
-    Engine.unpipe = function unpipe(target) {
-        if (target.unsubscribe instanceof Function) return target.unsubscribe(Engine);
-        else return eventHandler.unpipe(target);
-    };
+    eventHandler.emit('postrender');
+  };
 
-    /**
-     * Bind a callback function to an event type handled by this object.
-     *
-     * @static
-     * @method "on"
-     *
-     * @param {string} type event type key (for example, 'click')
-     * @param {function(string, Object)} handler callback
-     * @return {EventHandler} this
-     */
-    Engine.on = function on(type, handler) {
-        if (!(type in eventForwarders)) {
-            eventForwarders[type] = eventHandler.emit.bind(eventHandler, type);
+  // engage requestAnimationFrame
+  function loop() {
+    if (options.runLoop) {
+      Engine.step();
+      window.requestAnimationFrame(loop);
+    }
+    else loopEnabled = false;
+  }
 
-            addEngineListener(type, eventForwarders[type]);
-        }
-        return eventHandler.on(type, handler);
-    };
+  window.requestAnimationFrame(loop);
 
-    function addEngineListener(type, forwarder) {
-        if (!document.body) {
-            Engine.nextTick(addEventListener.bind(this, type, forwarder));
-            return;
-        }
+  //
+  // Upon main document window resize (unless on an "input" HTML element):
+  //   scroll to the top left corner of the window,
+  //   and for each managed Context: emit the 'resize' event and update its size.
+  // @param {Object=} event document event
+  //
+  function handleResize(event) {
+    for (var i = 0; i < contexts.length; i++) {
+      contexts[i].emit('resize');
+    }
+    eventHandler.emit('resize');
+  }
 
-        document.body.addEventListener(type, forwarder);
+  window.addEventListener('resize', handleResize, false);
+  handleResize();
+
+  window.addEventListener('resize', handleResize, false);
+  handleResize();
+
+  Engine.touchMoveEnabled = false;
+
+  Engine.enableTouchMove = function enableTouchMove() {
+    this.touchMoveEnabled = true;
+  };
+
+  /**
+   * Initialize famous for app mode
+   *
+   * @static
+   * @private
+   * @method initialize
+   */
+  function initialize() {
+    // prevent scrolling via browser
+    window.addEventListener('touchmove', function (event) {
+      if (event.target.tagName === 'TEXTAREA' || this.touchMoveEnabled) {
+        return true;
+      } else {
+        event.preventDefault();
+      }
+    }.bind(this), true);
+
+    addRootClasses();
+  }
+
+  var initialized = false;
+
+  function addRootClasses() {
+    if (!document.body) {
+      Engine.nextTick(addRootClasses);
+      return;
     }
 
-    /**
-     * Trigger an event, sending to all downstream handlers
-     *   listening for provided 'type' key.
-     *
-     * @method emit
-     *
-     * @param {string} type event type key (for example, 'click')
-     * @param {Object} event event data
-     * @return {EventHandler} this
-     */
-    Engine.emit = function emit(type, event) {
-        return eventHandler.emit(type, event);
-    };
+    document.body.classList.add('famous-root');
+    document.documentElement.classList.add('famous-root');
+  }
 
-    /**
-     * Unbind an event by type and handler.
-     *   This undoes the work of "on".
-     *
-     * @static
-     * @method removeListener
-     *
-     * @param {string} type event type key (for example, 'click')
-     * @param {function} handler function object to remove
-     * @return {EventHandler} internal event handler object (for chaining)
-     */
-    Engine.removeListener = function removeListener(type, handler) {
-        return eventHandler.removeListener(type, handler);
-    };
+  /**
+   * Add event handler object to set of downstream handlers.
+   *
+   * @method pipe
+   *
+   * @param {EventHandler} target event handler target object
+   * @return {EventHandler} passed event handler
+   */
+  Engine.pipe = function pipe(target) {
+    if (target.subscribe instanceof Function) return target.subscribe(Engine);
+    else return eventHandler.pipe(target);
+  };
 
-    /**
-     * Return the current calculated frames per second of the Engine.
-     *
-     * @static
-     * @method getFPS
-     *
-     * @return {Number} calculated fps
-     */
-    Engine.getFPS = function getFPS() {
-        return 1000 / frameTime;
-    };
+  /**
+   * Remove handler object from set of downstream handlers.
+   *   Undoes work of "pipe".
+   *
+   * @method unpipe
+   *
+   * @param {EventHandler} target target handler object
+   * @return {EventHandler} provided target
+   */
+  Engine.unpipe = function unpipe(target) {
+    if (target.unsubscribe instanceof Function) return target.unsubscribe(Engine);
+    else return eventHandler.unpipe(target);
+  };
 
-    /**
-     * Set the maximum fps at which the system should run. If internal render
-     *    loop is called at a greater frequency than this FPSCap, Engine will
-     *    throttle render and update until this rate is achieved.
-     *
-     * @static
-     * @method setFPSCap
-     *
-     * @param {Number} fps maximum frames per second
-     */
-    Engine.setFPSCap = function setFPSCap(fps) {
-        frameTimeLimit = Math.floor(1000 / fps);
-    };
+  /**
+   * Bind a callback function to an event type handled by this object.
+   *
+   * @static
+   * @method "on"
+   *
+   * @param {string} type event type key (for example, 'click')
+   * @param {function(string, Object)} handler callback
+   * @return {EventHandler} this
+   */
+  Engine.on = function on(type, handler) {
+    if (!(type in eventForwarders)) {
+      eventForwarders[type] = eventHandler.emit.bind(eventHandler, type);
 
-    /**
-     * Return engine options.
-     *
-     * @static
-     * @method getOptions
-     * @param {string} key
-     * @return {Object} engine options
-     */
-    Engine.getOptions = function getOptions(key) {
-        return optionsManager.getOptions(key);
-    };
+      addEngineListener(type, eventForwarders[type]);
+    }
+    return eventHandler.on(type, handler);
+  };
 
-    /**
-     * Set engine options
-     *
-     * @static
-     * @method setOptions
-     *
-     * @param {Object} [options] overrides of default options
-     * @param {Number} [options.fpsCap]  maximum fps at which the system should run
-     * @param {boolean} [options.runLoop=true] whether the run loop should continue
-     * @param {string} [options.containerType="div"] type of container element.  Defaults to 'div'.
-     * @param {string} [options.containerClass="famous-container"] type of container element.  Defaults to 'famous-container'.
-     */
-    Engine.setOptions = function setOptions(options) {
-        return optionsManager.setOptions.apply(optionsManager, arguments);
-    };
-
-    /**
-     * Creates a new Context for rendering and event handling with
-     *    provided document element as top of each tree. This will be tracked by the
-     *    process-wide Engine.
-     *
-     * @static
-     * @method createContext
-     *
-     * @param {Node} el will be top of Famo.us document element tree
-     * @return {Context} new Context within el
-     */
-    Engine.createContext = function createContext(el) {
-        if (!initialized && options.appMode) Engine.nextTick(initialize);
-
-        var needMountContainer = false;
-        if (!el) {
-            el = document.createElement(options.containerType);
-            el.classList.add(options.containerClass);
-            needMountContainer = true;
-        }
-
-        var context = new Context(el);
-        Engine.registerContext(context);
-
-        if (needMountContainer) mount(context, el);
-
-        return context;
-    };
-
-    function mount(context, el) {
-        if (!document.body) {
-            Engine.nextTick(mount.bind(this, context, el));
-            return;
-        }
-
-        document.body.appendChild(el);
-        context.emit('resize');
+  function addEngineListener(type, forwarder) {
+    if (!document.body) {
+      Engine.nextTick(addEventListener.bind(this, type, forwarder));
+      return;
     }
 
-    /**
-     * Registers an existing context to be updated within the run loop.
-     *
-     * @static
-     * @method registerContext
-     *
-     * @param {Context} context Context to register
-     * @return {FamousContext} provided context
-     */
-    Engine.registerContext = function registerContext(context) {
-        contexts.push(context);
-        return context;
-    };
+    document.body.addEventListener(type, forwarder);
+  }
 
-    /**
-     * Returns a list of all contexts.
-     *
-     * @static
-     * @method getContexts
-     * @return {Array} contexts that are updated on each tick
-     */
-    Engine.getContexts = function getContexts() {
-        return contexts;
-    };
+  /**
+   * Trigger an event, sending to all downstream handlers
+   *   listening for provided 'type' key.
+   *
+   * @method emit
+   *
+   * @param {string} type event type key (for example, 'click')
+   * @param {Object} event event data
+   * @return {EventHandler} this
+   */
+  Engine.emit = function emit(type, event) {
+    return eventHandler.emit(type, event);
+  };
 
-    /**
-     * Removes a context from the run loop. Note: this does not do any
-     *     cleanup.
-     *
-     * @static
-     * @method deregisterContext
-     *
-     * @param {Context} context Context to deregister
-     */
-    Engine.deregisterContext = function deregisterContext(context) {
-        var i = contexts.indexOf(context);
-        if (i >= 0) contexts.splice(i, 1);
-    };
+  /**
+   * Unbind an event by type and handler.
+   *   This undoes the work of "on".
+   *
+   * @static
+   * @method removeListener
+   *
+   * @param {string} type event type key (for example, 'click')
+   * @param {function} handler function object to remove
+   * @return {EventHandler} internal event handler object (for chaining)
+   */
+  Engine.removeListener = function removeListener(type, handler) {
+    return eventHandler.removeListener(type, handler);
+  };
 
-    /**
-     * Queue a function to be executed on the next tick of the
-     *    Engine.
-     *
-     * @static
-     * @method nextTick
-     *
-     * @param {function(Object)} fn function accepting window object
-     */
-    Engine.nextTick = function nextTick(fn) {
-        nextTickQueue.push(fn);
-    };
+  /**
+   * Return the current calculated frames per second of the Engine.
+   *
+   * @static
+   * @method getFPS
+   *
+   * @return {Number} calculated fps
+   */
+  Engine.getFPS = function getFPS() {
+    return 1000 / frameTime;
+  };
 
-    /**
-     * Queue a function to be executed sometime soon, at a time that is
-     *    unlikely to affect frame rate.
-     *
-     * @static
-     * @method defer
-     *
-     * @param {Function} fn
-     */
-    Engine.defer = function defer(fn) {
-        deferQueue.push(fn);
-    };
+  /**
+   * Set the maximum fps at which the system should run. If internal render
+   *    loop is called at a greater frequency than this FPSCap, Engine will
+   *    throttle render and update until this rate is achieved.
+   *
+   * @static
+   * @method setFPSCap
+   *
+   * @param {Number} fps maximum frames per second
+   */
+  Engine.setFPSCap = function setFPSCap(fps) {
+    frameTimeLimit = Math.floor(1000 / fps);
+  };
 
-    optionsManager.on('change', function(data) {
-        if (data.id === 'fpsCap') Engine.setFPSCap(data.value);
-        else if (data.id === 'runLoop') {
-            // kick off the loop only if it was stopped
-            if (!loopEnabled && data.value) {
-                loopEnabled = true;
-                window.requestAnimationFrame(loop);
-            }
-        }
-    });
+  /**
+   * Return engine options.
+   *
+   * @static
+   * @method getOptions
+   * @param {string} key
+   * @return {Object} engine options
+   */
+  Engine.getOptions = function getOptions(key) {
+    return optionsManager.getOptions(key);
+  };
 
-    module.exports = Engine;
+  /**
+   * Set engine options
+   *
+   * @static
+   * @method setOptions
+   *
+   * @param {Object} [options] overrides of default options
+   * @param {Number} [options.fpsCap]  maximum fps at which the system should run
+   * @param {boolean} [options.runLoop=true] whether the run loop should continue
+   * @param {string} [options.containerType="div"] type of container element.  Defaults to 'div'.
+   * @param {string} [options.containerClass="famous-container"] type of container element.  Defaults to 'famous-container'.
+   */
+  Engine.setOptions = function setOptions(options) {
+    return optionsManager.setOptions.apply(optionsManager, arguments);
+  };
+
+  /**
+   * Creates a new Context for rendering and event handling with
+   *    provided document element as top of each tree. This will be tracked by the
+   *    process-wide Engine.
+   *
+   * @static
+   * @method createContext
+   *
+   * @param {Node} el will be top of Famo.us document element tree
+   * @return {Context} new Context within el
+   */
+  Engine.createContext = function createContext(el) {
+    if (!initialized && options.appMode) Engine.nextTick(initialize.bind(this));
+
+    var needMountContainer = false;
+    if (!el) {
+      el = document.createElement(options.containerType);
+      el.classList.add(options.containerClass);
+      needMountContainer = true;
+    }
+
+    var context = new Context(el);
+    Engine.registerContext(context);
+
+    if (needMountContainer) mount(context, el);
+
+    return context;
+  };
+
+  function mount(context, el) {
+    if (!document.body) {
+      Engine.nextTick(mount.bind(this, context, el));
+      return;
+    }
+
+    document.body.appendChild(el);
+    context.emit('resize');
+  }
+
+  /**
+   * Registers an existing context to be updated within the run loop.
+   *
+   * @static
+   * @method registerContext
+   *
+   * @param {Context} context Context to register
+   * @return {FamousContext} provided context
+   */
+  Engine.registerContext = function registerContext(context) {
+    contexts.push(context);
+    return context;
+  };
+
+  /**
+   * Returns a list of all contexts.
+   *
+   * @static
+   * @method getContexts
+   * @return {Array} contexts that are updated on each tick
+   */
+  Engine.getContexts = function getContexts() {
+    return contexts;
+  };
+
+  /**
+   * Removes a context from the run loop. Note: this does not do any
+   *     cleanup.
+   *
+   * @static
+   * @method deregisterContext
+   *
+   * @param {Context} context Context to deregister
+   */
+  Engine.deregisterContext = function deregisterContext(context) {
+    var i = contexts.indexOf(context);
+    if (i >= 0) contexts.splice(i, 1);
+  };
+
+  /**
+   * Queue a function to be executed on the next tick of the
+   *    Engine.
+   *
+   * @static
+   * @method nextTick
+   *
+   * @param {function(Object)} fn function accepting window object
+   */
+  Engine.nextTick = function nextTick(fn) {
+    nextTickQueue.push(fn);
+  };
+
+  /**
+   * Queue a function to be executed sometime soon, at a time that is
+   *    unlikely to affect frame rate.
+   *
+   * @static
+   * @method defer
+   *
+   * @param {Function} fn
+   */
+  Engine.defer = function defer(fn) {
+    deferQueue.push(fn);
+  };
+
+  optionsManager.on('change', function (data) {
+    if (data.id === 'fpsCap') Engine.setFPSCap(data.value);
+    else if (data.id === 'runLoop') {
+      // kick off the loop only if it was stopped
+      if (!loopEnabled && data.value) {
+        loopEnabled = true;
+        window.requestAnimationFrame(loop);
+      }
+    }
+  });
+
+  module.exports = Engine;
 });

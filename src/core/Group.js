@@ -31,7 +31,7 @@ define(function(require, exports, module) {
         this.context = new Context(this._container);
         this.setContent(this._container);
         this._groupSize = [undefined, undefined];
-        this._size = options ? (options.size || Group.SIZE_ZERO) : Group.SIZE_ZERO;
+        this._surfaceSize = options ? (options.size || Group.SIZE_ZERO) : Group.SIZE_ZERO;
     }
 
     /** @const */
@@ -106,7 +106,7 @@ define(function(require, exports, module) {
             transform: Transform.thenMove(transform, [-origin[0] * size[0], -origin[1] * size[1], 0]),
             opacity: opacity,
             origin: origin,
-            size: this._size
+            size: this._surfaceSize
         });
         if (size[0] !== this._groupSize[0] || size[1] !== this._groupSize[1]) {
             this._groupSize[0] = size[0];

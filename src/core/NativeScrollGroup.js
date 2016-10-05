@@ -22,7 +22,7 @@ define(function(require, exports, module) {
     NativeScrollGroup.prototype = Object.create(Group.prototype);
 
     NativeScrollGroup.prototype.commit = function commit(context) {
-        this._size = context.size;
+        this._surfaceSize = context.size;
         Group.prototype.commit.apply(this, arguments);
     };
 

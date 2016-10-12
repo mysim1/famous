@@ -47,6 +47,7 @@ define(function (require, exports, module) {
     }
   };
 
+
   NativeScrollGroup.prototype.getScrollOffset = function getScrollOffset() {
     var element = this._element;
     if (element) {
@@ -55,7 +56,23 @@ define(function (require, exports, module) {
     return 0;
   };
 
+  NativeScrollGroup.prototype.getMaxScrollOffset = function getScrollOffset() {
+    var element = this._element;
+    if (element) {
+      return element.scrollHeight - this._surfaceSize[1];
+    }
+    return 0;
+  };
 
+  NativeScrollGroup.prototype.scrollToBottom = function getScrollOffset() {
+    var element = this._element;
+    if (element) {
+      this.setScrollOffset(element.scrollHeight);
+    } else {
+      this.once('deploy', this.setScrollOffset.bind(this, element.scrollHeight));
+    }
+    return 0;
+  };
 
 
   NativeScrollGroup.prototype.elementClass = 'famous-native-scroller';

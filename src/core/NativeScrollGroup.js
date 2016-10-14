@@ -68,11 +68,9 @@ define(function (require, exports, module) {
     var element = this._element;
     if (element) {
       this.setScrollOffset(element.scrollHeight);
-    } else {
-      this.once('deploy', this.setScrollOffset.bind(this, element.scrollHeight));
     }
     return 0;
-  };
+  };/**/
 
 
   NativeScrollGroup.prototype.elementClass = 'famous-native-scroller';

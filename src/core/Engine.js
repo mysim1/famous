@@ -76,8 +76,9 @@ define(function (require, exports, module) {
 
     var currentTime = Date.now();
 
+    this._lastFrameTimeDelta = currentTime - lastTime;
     // skip frame if we're over our framerate cap
-    if (frameTimeLimit && currentTime - lastTime < frameTimeLimit) return;
+    if (frameTimeLimit && this._lastFrameTimeDelta < frameTimeLimit) return;
 
     var i = 0;
 
@@ -98,6 +99,10 @@ define(function (require, exports, module) {
     for (i = 0; i < contexts.length; i++) contexts[i].update();
 
     eventHandler.emit('postrender');
+  };
+
+  Engine.getFrameTimeDelta = function getFrameTimeDelta() {
+    return this._lastFrameTimeDelta;
   };
 
   // engage requestAnimationFrame
@@ -139,7 +144,7 @@ define(function (require, exports, module) {
     this.touchMoveEnabled = true;
   };
 
-  
+
   /**
    * Initialize famous for app mode
    *

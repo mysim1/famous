@@ -59,17 +59,21 @@ define(function(require, exports, module) {
      * @param {string} type type of element, e.g. 'div'
      * @return {Node} allocated document element
      */
-    ElementAllocator.prototype.allocate = function allocate(type) {
+    ElementAllocator.prototype.allocate = function allocate(type, insertFirst) {
         type = type.toLowerCase();
         if (!(type in this.detachedNodes)) this.detachedNodes[type] = [];
         var nodeStore = this.detachedNodes[type];
         var result;
-        if (nodeStore.length > 0) {
+        if (nodeStore.length > 0 && !insertFirst) {
             result = nodeStore.pop();
         }
         else {
             result = document.createElement(type);
-            this.container.appendChild(result);
+            if(insertFirst){
+              this.container.insertBefore(result, this.container.firstChild);
+            } else {
+              this.container.appendChild(result);
+            }
         }
         this.nodeCount++;
         return result;

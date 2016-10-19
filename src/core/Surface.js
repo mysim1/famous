@@ -283,7 +283,7 @@ define(function(require, exports, module) {
      * @param {ElementAllocator} allocator document element pool for this context
      */
     Surface.prototype.setup = function setup(allocator) {
-        var target = allocator.allocate(this.elementType);
+        var target =  this.allocate(allocator);
         if (this.elementClass) {
             if (this.elementClass instanceof Array) {
                 for (var i = 0; i < this.elementClass.length; i++) {
@@ -306,6 +306,10 @@ define(function(require, exports, module) {
         this._originDirty = true;
         this._transformDirty = true;
     };
+
+  Surface.prototype.allocate = function allocate(allocator){
+    return allocator.allocate(this.elementType);
+  };
 
     /**
      * Apply changes from this component to the corresponding document element.

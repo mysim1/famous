@@ -36,6 +36,7 @@ define(function (require, exports, module) {
    * Sets the scroll offset
    * @param offset. Defaults to the old scroll offset that was set when there wasn't any element.
    */
+
   NativeScrollGroup.prototype.setScrollOffset = function setScrollOffset(offset) {
     var element = this._element;
     if (element) {
@@ -44,6 +45,19 @@ define(function (require, exports, module) {
     } else {
       /* Save to cache and set on deploy instead */
       this._cachedScrollOffset = offset;
+    }
+  };
+
+  /**
+   * Hack to force an element redraw that fixes certain bug for elements getting stuck on their current scrollOffset
+   */
+  NativeScrollGroup.prototype.forceScrollOffsetInvalidation = function forceScrollOffsetInvalidation() {
+    var element = this._element;
+    if (element) {
+      var disp = element.style.display;
+      element.style.display = 'none';
+      var trick = element.offsetHeight;
+      element.style.display = disp;
     }
   };
 

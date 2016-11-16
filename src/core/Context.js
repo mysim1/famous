@@ -15,7 +15,7 @@ define(function(require, exports, module) {
     var Transitionable = require('../transitions/Transitionable');
 
     var _zeroZero = [0, 0];
-    var usePrefix = !('perspective' in document.documentElement.style);
+    var usePrefix = typeof document !== 'undefined' && !('perspective' in document.documentElement.style);
 
     function _getElementSize() {
         var element = this.container;

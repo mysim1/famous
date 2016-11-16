@@ -113,8 +113,9 @@ define(function (require, exports, module) {
     }
     else loopEnabled = false;
   }
-
-  window.requestAnimationFrame(loop);
+  if(typeof window !== 'undefined'){
+    window.requestAnimationFrame(loop);
+  }
 
   //
   // Upon main document window resize (unless on an "input" HTML element):
@@ -129,11 +130,14 @@ define(function (require, exports, module) {
     eventHandler.emit('resize');
   }
 
-  window.addEventListener('resize', handleResize, false);
-  handleResize();
+  if(typeof window !== 'undefined') {
 
-  window.addEventListener('resize', handleResize, false);
-  handleResize();
+    window.addEventListener('resize', handleResize, false);
+    handleResize();
+
+    window.addEventListener('resize', handleResize, false);
+    handleResize();
+  }
 
   Engine.touchMoveEnabled = false;
 

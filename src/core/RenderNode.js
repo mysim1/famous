@@ -142,12 +142,12 @@ define(function(require, exports, module) {
      * Cleans up all current renderables
      * @param context
      */
-    RenderNode.prototype.cleanup = function commit(context) {
+    RenderNode.prototype.cleanup = function commit(allocator) {
         var prevKeys = Object.keys(this._prevResults);
         for (var i = 0; i < prevKeys.length; i++) {
             var id = prevKeys[i];
             var object = Entity.get(id);
-            if (object.cleanup) object.cleanup(context.allocator);
+            if (object.cleanup) object.cleanup(allocator);
         }
     };
 

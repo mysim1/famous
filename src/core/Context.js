@@ -95,6 +95,13 @@ define(function(require, exports, module) {
     };
 
     /**
+     *  Cleans up all the RenderNode
+     */
+    Context.prototype.cleanup = function cleanup() {
+        this._node.cleanup(this._allocator);
+    };
+
+    /**
      * Gets viewport size for Context.
      *
      * @method getSize

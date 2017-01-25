@@ -86,6 +86,7 @@ define(function(require, exports, module) {
     Group.prototype.recall = function recall(target) {
         this._container = document.createDocumentFragment();
         this.context.migrate(this._container);
+        this.context.cleanup();
     };
 
     /**

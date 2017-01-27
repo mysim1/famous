@@ -102,6 +102,11 @@ define(function(require, exports, module) {
     return this;
   };
 
+  EventEmitter.prototype.replaceListeners = function replaceListeners(type, handler) {
+    this.listeners[type] = [];
+    return this.on(type, handler);
+  };
+
   /**
    * Call event handlers with this set to owner.
    *

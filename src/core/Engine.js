@@ -143,7 +143,7 @@ define(function (require, exports, module) {
 
   Engine.enableTouchMove = function enableTouchMove() {
     if(!this.touchMoveEnabled){
-      console.log("Warning: Touch move enabled. Outcomes might be unwated")
+      console.log("Warning: Touch move enabled. Outcomes might be unwated");
     }
     this.touchMoveEnabled = true;
   };

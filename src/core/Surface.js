@@ -45,6 +45,7 @@ define(function(require, exports, module) {
         this._trueSizeCheck = true;
 
         this._dirtyClasses = [];
+        this._dirtyAttributes = [];
 
         if (options) this.setOptions(options);
 
@@ -79,6 +80,20 @@ define(function(require, exports, module) {
      */
     Surface.prototype.getAttributes = function getAttributes() {
         return this.attributes;
+    };
+
+    /**
+     * Removes existing attributes from this Surface (e.g. needed for 'disabled').
+     * @method removeAttributes
+     * @param {Array} attributes List of attribute names to remove
+     */
+    Surface.prototype.removeAttributes = function removeAttributes(attributes) {
+        for(var index in attributes) {
+            var name = attributes[index];
+            delete this.attributes[name];
+            this._dirtyAttributes.push(name);
+        }
+        this._attributesDirty = true;
     };
 
     /**
@@ -254,11 +269,16 @@ define(function(require, exports, module) {
         }
     }
 
-    // Apply values of all Famous-managed attributes to the document element.
+    //  Apply values of all Famous-managed attributes to the document element.
     //  These will be deployed to the document on call to #setup().
     function _applyAttributes(target) {
         for (var n in this.attributes) {
             target.setAttribute(n, this.attributes[n]);
+        }
+        for (var index in this._dirtyAttributes) {
+            var name = this._dirtyAttributes[index];
+            target.removeAttribute(name);
+            this._dirtyAttributes.shift();
         }
     }
 

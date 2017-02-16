@@ -164,7 +164,7 @@ define(function (require, exports, module) {
       } else {
         event.preventDefault();
       }
-    }.bind(this), true);
+    }.bind(this), { capture: true, passive: false });
 
     addRootClasses();
   }

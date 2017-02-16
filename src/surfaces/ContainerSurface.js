@@ -11,6 +11,7 @@
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
     var Context = require('../core/Context');
+    var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
     /**
      * ContainerSurface is an object designed to contain surfaces and
@@ -44,7 +45,7 @@ define(function(require, exports, module) {
         this.setContent(this._container);
     }
 
-    ContainerSurface.prototype = Object.create(Surface.prototype);
+    staticInherits(ContainerSurface, Surface);
     ContainerSurface.prototype.constructor = ContainerSurface;
     ContainerSurface.prototype.elementType = 'div';
     ContainerSurface.prototype.elementClass = 'famous-surface';

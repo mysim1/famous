@@ -9,8 +9,9 @@
 
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
+    var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
-    /**
+  /**
      * Creates a famous surface containing video content. Currently adding
      *   controls and manipulating the video are not supported through the
      *   surface interface, but can be accomplished via standard JavaScript
@@ -34,7 +35,7 @@ define(function(require, exports, module) {
         if (options) this.setOptions(options);
     }
 
-    VideoSurface.prototype = Object.create(Surface.prototype);
+    staticInherits(VideoSurface, Surface);
     VideoSurface.prototype.constructor = VideoSurface;
 
     VideoSurface.DEFAULT_OPTIONS = {

@@ -9,6 +9,7 @@
 
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
+    var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
     /**
      * A Famo.us surface in the form of an HTML input element.
@@ -23,23 +24,33 @@ define(function(require, exports, module) {
      * @param {string} [options.value] value of text
      */
     function InputSurface(options) {
-        this._placeholder = options.placeholder !== undefined ? options.placeholder : '';
-        this._value       = options.value !== undefined ? options.value : '';
-        this._type        = options.type || 'text';
-        this._name        = options.name || '';
-
         Surface.apply(this, arguments);
+        if(options)
+          this.setOptions(options);
+
+
 
         this.on('click', this.focus.bind(this));
         window.addEventListener('click', function(event) {
             if (event.target !== this._currentTarget) this.blur();
         }.bind(this));
     }
+
+
+    staticInherits(InputSurface, Surface);
     InputSurface.prototype = Object.create(Surface.prototype);
     InputSurface.prototype.constructor = InputSurface;
 
     InputSurface.prototype.elementType = 'input';
     InputSurface.prototype.elementClass = 'famous-surface';
+
+    InputSurface.prototype.setOptions = function setOptions(options) {
+      this._placeholder = options.placeholder !== undefined ? options.placeholder : '';
+      this._value       = options.value !== undefined ? options.value : '';
+      this._type        = options.type || 'text';
+      this._name        = options.name || '';
+      this._contentDirty = true;
+    };
 
     /**
      * Set placeholder text.  Note: Triggers a repaint.

@@ -10,6 +10,7 @@
 
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
+    var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
     /**
      * A surface containing image content.
@@ -53,7 +54,7 @@ define(function(require, exports, module) {
         };
     };
 
-    ImageSurface.prototype = Object.create(Surface.prototype);
+    staticInherits(ImageSurface, Surface);
     ImageSurface.prototype.constructor = ImageSurface;
     ImageSurface.prototype.elementType = 'img';
     ImageSurface.prototype.elementClass = 'famous-surface';

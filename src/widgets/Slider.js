@@ -24,6 +24,8 @@ define(function(require, exports, module) {
         touch : TouchSync
     });
 
+    Slider.with = Surface.with;
+
     /** @constructor */
     function Slider(options) {
         this.options = Object.create(Slider.DEFAULT_OPTIONS);

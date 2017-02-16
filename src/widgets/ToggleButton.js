@@ -58,6 +58,8 @@ define(function(require, exports, module) {
         if (options) this.setOptions(options);
     }
 
+    ToggleButton.with = Surface.with;
+
     ToggleButton.OFF = 0;
     ToggleButton.ON = 1;
     ToggleButton.TOGGLE = 2;

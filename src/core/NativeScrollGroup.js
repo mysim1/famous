@@ -3,6 +3,8 @@
  */
 define(function (require, exports, module) {
   var Group = require('./Group.js');
+  var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
+
 
   /**
    * A Context designed to contain surfaces and set properties
@@ -20,7 +22,7 @@ define(function (require, exports, module) {
     Group.call(this, options);
   }
 
-  NativeScrollGroup.prototype = Object.create(Group.prototype);
+  staticInherits(Group, NativeScrollGroup);
 
   NativeScrollGroup.prototype.commit = function commit(context) {
     this._surfaceSize = context.size;

@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     var Context = require('./Context');
     var Transform = require('./Transform');
     var Surface = require('./Surface');
+    var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
     /**
      * A Context designed to contain surfaces and set properties
@@ -36,8 +37,7 @@ define(function(require, exports, module) {
 
     /** @const */
     Group.SIZE_ZERO = [0, 0];
-
-    Group.prototype = Object.create(Surface.prototype);
+    staticInherits(Group, Surface);
     Group.prototype.elementType = 'div';
     Group.prototype.elementClass = 'famous-group';
 

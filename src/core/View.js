@@ -39,6 +39,7 @@ define(function(require, exports, module) {
         if (options) this.setOptions(options);
     }
 
+
     View.DEFAULT_OPTIONS = {}; // no defaults
 
     /**

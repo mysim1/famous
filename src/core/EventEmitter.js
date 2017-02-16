@@ -64,17 +64,21 @@ define(function(require, exports, module) {
     return this;
   };
 
-  /**
+    /**
    * Listens once
    * @param type
    * @param handler
    * @returns {EventHandler}
    */
-  EventEmitter.prototype.once = function once(type, handler) {
-    return this.on(type, function onceWrapper() {
-      this.removeListener(type, onceWrapper);
-      handler.apply(this._owner,arguments);
-    }, this);
+  EventEmitter.prototype.once = function once(type, handler, listenUpstream) {
+    if(!listenUpstream)
+    return new Promise((resolve) => {
+      return this.on(type, function onceWrapper() {
+        this.removeListener(type, onceWrapper);
+        handler.apply(this._owner,arguments);
+        resolve(...arguments);
+      }, this);
+    });
   };
 
   /**

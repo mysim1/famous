@@ -9,6 +9,7 @@
 
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
+    var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
     /**
      * A surface containing an HTML5 Canvas element.
@@ -31,8 +32,7 @@ define(function(require, exports, module) {
         }
         this._contextId = undefined;
     }
-
-    CanvasSurface.prototype = Object.create(Surface.prototype);
+    staticInherits(CanvasSurface, Surface);
     CanvasSurface.prototype.constructor = CanvasSurface;
     CanvasSurface.prototype.elementType = 'canvas';
     CanvasSurface.prototype.elementClass = 'famous-surface';

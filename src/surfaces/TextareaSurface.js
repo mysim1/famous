@@ -9,8 +9,9 @@
 
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
+    var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
-    /**
+  /**
      * A Famo.us surface in the form of an HTML textarea element.
      *   This extends the Surface class.
      *
@@ -36,7 +37,7 @@ define(function(require, exports, module) {
         Surface.apply(this, arguments);
         this.on('click', this.focus.bind(this));
     }
-    TextareaSurface.prototype = Object.create(Surface.prototype);
+    staticInherits(TextareaSurface, Surface);
     TextareaSurface.prototype.constructor = TextareaSurface;
 
     TextareaSurface.prototype.elementType = 'textarea';

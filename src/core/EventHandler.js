@@ -139,6 +139,8 @@ define(function(require, exports, module) {
     else return false;
   };
 
+
+
   /**
    * Bind a callback function to an event type handled by this object.
    *
@@ -146,11 +148,14 @@ define(function(require, exports, module) {
    *
    * @param {string} type event type key (for example, 'click')
    * @param {function(string, Object)} handler callback
+   * @param {Boolean} listenUpstream defaults to true. If the events should bubble
    * @return {EventHandler} this
    */
-  EventHandler.prototype.on = function on(type, handler) {
-    EventEmitter.prototype.on.apply(this, arguments);
-    if (!(type in this.upstreamListeners)) {
+  EventHandler.prototype.on = function on(type, handler, listenUpstream) {
+    if(!listenUpstream)
+      listenUpstream = true;
+    EventEmitter.prototype.on.call(this, type, handler, listenUpstream);
+    if (!(type in this.upstreamListeners) && listenUpstream) {
       var upstreamListener = this.trigger.bind(this, type);
       this.upstreamListeners[type] = upstreamListener;
       for (var i = 0; i < this.upstream.length; i++) {
@@ -160,14 +165,25 @@ define(function(require, exports, module) {
     return this;
   };
 
-  /**
+  EventHandler.prototype.onOwnEvent = function on(type, handler) {
+    return this.on(type, handler, false);
+  };
+
+
+  EventHandler.prototype.onceOwnEvent = function once(type, handler) {
+    return this.once(type, handler, false);
+  };
+    /**
    * Listens once
    * @param type
    * @param handler
+   * @param {Boolean} listenUpstream Whether we should listen for piped events
    * @returns {EventHandler}
    */
-  EventHandler.prototype.once = function on(type, handler) {
-    EventEmitter.prototype.once.apply(this, arguments);
+  EventHandler.prototype.once = function once(type, handler, listenUpstream) {
+    if(!listenUpstream)
+      listenUpstream = true;
+    EventEmitter.prototype.once(this, type);
     return this;
   };
 

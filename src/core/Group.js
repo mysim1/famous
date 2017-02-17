@@ -84,8 +84,15 @@ define(function(require, exports, module) {
      * @param {Node} target node to which the component was deployed
      */
     Group.prototype.recall = function recall(target) {
-        this._container = document.createDocumentFragment();
-        this.context.migrate(this._container);
+        /*
+         * Previous recalling heuristic was this:
+         * this._container = document.createDocumentFragment();
+         * this.context.migrate(this._container);
+         * However this was abandoned because when the same surfaces were initialized within a different context,
+         * they didn't know they needed to be setup again, because their elements still existed. Instead, the
+         * current solution keeps the elements in the DOM in a nested manner in case they would be needed again.
+         *
+         * */
         this.context.cleanup();
     };
 
@@ -114,6 +121,7 @@ define(function(require, exports, module) {
             this._groupSize[1] = size[1];
             this.context.setSize(size);
         }
+        /* Executes the commit functions of the children */
         this.context.update({
             transform: Transform.translate(-origin[0] * size[0], -origin[1] * size[1], 0),
             origin: origin,

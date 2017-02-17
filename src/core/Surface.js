@@ -436,6 +436,12 @@ define(function(require, exports, module) {
      * @param {ElementAllocator} allocator
      */
     Surface.prototype.cleanup = function cleanup(allocator) {
+        /* If clean-up done twice, return. This happens when a surface is cleaned up from
+         * one context (e.g. group) and needs to be removed from another context that used to
+         * display this surface. */
+        if(!this._currentTarget){
+            return;
+        }
         var i = 0;
         var target = this._currentTarget;
         this._eventOutput.emit('recall');

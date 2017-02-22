@@ -27,9 +27,7 @@ define(function (require, exports, module) {
   function Group(options) {
     Surface.call(this, options);
     this._shouldRecalculateSize = false;
-    this._container = document.createDocumentFragment();
-    this.context = new Context(this._container);
-    this.setContent(this._container);
+    this.context = new Context();
     this._groupSize = [undefined, undefined];
     this._surfaceSize = options ? (options.size || Group.SIZE_ZERO) : Group.SIZE_ZERO;
   }
@@ -75,6 +73,23 @@ define(function (require, exports, module) {
     this.context.migrate(target);
   };
 
+
+  Group.prototype.allocate = function allocate(allocator) {
+    this._allocator = allocator.allocate({ type: this.elementType, isNested: true });
+    return this._allocator.container;
+  };
+
+  /**
+   * Place the document element this component manages into the document.
+   *
+   * @private
+   * @method deploy
+   * @param {Node} target document parent of this container
+   */
+  Group.prototype.deploy = function deploy(target) {
+    //Do nothing
+  };
+
   /**
    * Remove this component and contained content from the document
    *
@@ -93,8 +108,16 @@ define(function (require, exports, module) {
      * current solution keeps the elements in the DOM in a nested manner in case they would be needed again.
      *
      * */
-    this.context.cleanup();
   };
+
+
+  Group.prototype.deallocate = function deallocate(allocator){
+    this.context.cleanup(this._allocator);
+    return allocator.deallocateAllocator(this._allocator);
+    this._allocator = {};
+  };
+
+
 
   /**
    * Apply changes from this component to the corresponding document element.
@@ -123,6 +146,7 @@ define(function (require, exports, module) {
     }
     /* Executes the commit functions of the children */
     this.context.update({
+      allocator: this._allocator,
       transform: Transform.translate(-origin[0] * size[0], -origin[1] * size[1], 0),
       origin: origin,
       size: size

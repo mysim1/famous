@@ -25,6 +25,7 @@ define(function (require, exports, module) {
    * @class Engine
    */
   var Context = require('./Context');
+  var ElementAllocator = require('./ElementAllocator');
   var EventHandler = require('./EventHandler');
   var OptionsManager = require('./OptionsManager');
 
@@ -340,7 +341,8 @@ define(function (require, exports, module) {
       needMountContainer = true;
     }
 
-    var context = new Context(el);
+    var context = new Context();
+    context.setPermanentElementAllocator(new ElementAllocator(el));
     Engine.registerContext(context);
 
     if (needMountContainer) mount(context, el);

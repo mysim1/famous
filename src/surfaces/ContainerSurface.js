@@ -11,6 +11,7 @@
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
     var Context = require('../core/Context');
+    var ElementAllocator = require('../core/ElementAllocator');
 
     /**
      * ContainerSurface is an object designed to contain surfaces and
@@ -41,6 +42,7 @@ define(function(require, exports, module) {
         this._container.classList.add('famous-container-group');
         this._shouldRecalculateSize = false;
         this.context = new Context(this._container);
+        this.context.setPermanentElementAllocator(new ElementAllocator(this._container));
         this.setContent(this._container);
     }
 

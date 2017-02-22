@@ -327,8 +327,12 @@ define(function(require, exports, module) {
         this._transformDirty = true;
     };
 
+  Surface.prototype.deallocate = function deallocate(allocator, target){
+    return allocator.deallocate(target);
+  };
+
   Surface.prototype.allocate = function allocate(allocator){
-    return allocator.allocate(this.elementType);
+    return allocator.allocate({type: this.elementType});
   };
 
     /**
@@ -467,7 +471,7 @@ define(function(require, exports, module) {
         }
         this.detach(target);
         this._currentTarget = null;
-        allocator.deallocate(target);
+        this.deallocate(allocator, target);
     };
 
     /**
@@ -483,8 +487,9 @@ define(function(require, exports, module) {
         while (target.hasChildNodes())
           target.removeChild(target.firstChild);
         target.appendChild(content);
-      } else
+      } else {
         target.innerHTML = content;
+      }
       this.content = target.innerHTML;
     };
 

@@ -8,6 +8,7 @@
  */
 
 define(function(require, exports, module) {
+    var Context = require('./Context.js');
 
     /**
      * Internal helper object to Context that handles the process of
@@ -22,8 +23,9 @@ define(function(require, exports, module) {
     function ElementAllocator(container) {
         if (!container) container = document.createDocumentFragment();
         this.container = container;
-        this.detachedNodes = {};
-        this.nodeCount = 0;
+        this.detachedElementOutputs = {};
+        this.detachedContexts = {};
+
     }
 
     /**
@@ -35,6 +37,7 @@ define(function(require, exports, module) {
      * @param {Node} container document element to which Famo.us content will be migrated
      */
     ElementAllocator.prototype.migrate = function migrate(container) {
+      throw new Error('not supported');
         var oldContainer = this.container;
         if (container === oldContainer) return;
 
@@ -56,29 +59,54 @@ define(function(require, exports, module) {
      * @private
      * @method allocate
      *
-     * @param {string} type type of element, e.g. 'div'
+     * @param {String} options.type type of element, e.g. 'div'
+     * @param {Boolean} options.insertFirst Whether it should be allocated from the top instead of the bottom
+     * or at the end. Defaults to false (at the bottom).
+     * @param {Boolean} options.isNested Whether it should allocate a node that already is nested (treated separately)
      * @return {Node} allocated document element
      */
-    ElementAllocator.prototype.allocate = function allocate(type, insertFirst) {
+    ElementAllocator.prototype.allocate = function allocate(options) {
+        var type = options.type.toLocaleLowerCase();
+        var insertFirst = !!options.insertFirst;
+        var isNested = !!options.isNested;
         type = type.toLowerCase();
-        if (!(type in this.detachedNodes)) this.detachedNodes[type] = [];
-        var nodeStore = this.detachedNodes[type];
+        var detachedList = isNested ? this.detachedContexts : this.detachedElementOutputs;
+        if (!(type in detachedList)) detachedList[type] = [];
+        var nodeStore = detachedList[type];
         var result;
         if (nodeStore.length > 0 && !insertFirst) {
             result = nodeStore.pop();
         }
         else {
-            result = document.createElement(type);
-            if(insertFirst){
-              this.container.insertBefore(result, this.container.firstChild);
-            } else {
-              this.container.appendChild(result);
-            }
+            result = this._allocateNewElementOutput(type, insertFirst);
+          if(isNested){
+            result = this._allocateNewAllocator(result);
+          }
         }
-        this.nodeCount++;
         return result;
     };
 
+  ElementAllocator.prototype._allocateNewAllocator = function _allocateNewContext(container) {
+    return new ElementAllocator(container);
+  };
+
+  ElementAllocator.prototype._allocateNewElementOutput = function _allocateNewElementOutput(type, insertFirst) {
+    var result = document.createElement(type);
+    if(insertFirst){
+      this.container.insertBefore(result, this.container.firstChild);
+    } else {
+      this.container.appendChild(result);
+    }
+    return result;
+  };
+
+  ElementAllocator.prototype.deallocateAllocator = function deallocateAllocator(allocator) {
+    var elementToDeallocate = allocator.container;
+    var nodeType = elementToDeallocate.nodeName.toLocaleLowerCase();
+    var nodeStore = this.detachedContexts[nodeType];
+    nodeStore.push(allocator);
+    // this._deallocateElementOfType(elementToDeallocate, nodeType);
+  };
     /**
      * De-allocate an element of specified type to the pool.
      *
@@ -87,24 +115,18 @@ define(function(require, exports, module) {
      *
      * @param {Node} element document element to deallocate
      */
+
     ElementAllocator.prototype.deallocate = function deallocate(element) {
         var nodeType = element.nodeName.toLowerCase();
-        var nodeStore = this.detachedNodes[nodeType];
-        nodeStore.push(element);
-        this.nodeCount--;
+        this._deallocateElementOfType(element, nodeType);
     };
 
-    /**
-     * Get count of total allocated nodes in the document.
-     *
-     * @private
-     * @method getNodeCount
-     *
-     * @return {Number} total node count
-     */
-    ElementAllocator.prototype.getNodeCount = function getNodeCount() {
-        return this.nodeCount;
-    };
+
+  ElementAllocator.prototype._deallocateElementOfType = function _deallocate(element, nodeType) {
+    var nodeStore = this.detachedElementOutputs[nodeType];
+    nodeStore.push(element);
+  };
+
 
     module.exports = ElementAllocator;
 });

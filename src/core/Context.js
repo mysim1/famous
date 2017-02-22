@@ -17,8 +17,10 @@ define(function(require, exports, module) {
     var _zeroZero = [0, 0];
     var usePrefix = typeof document !== 'undefined' && !('perspective' in document.documentElement.style);
 
+  //TODO this function is quite ugly as it depends on the last state of _nodeContext
     function _getElementSize() {
-        var element = this.container;
+        var allocator = this._permanentAllocator || this._nodeContext.allocator;
+        var element = allocator.container;
         return [element.clientWidth, element.clientHeight];
     }
 
@@ -38,19 +40,16 @@ define(function(require, exports, module) {
      * @private
      * @param {Node} container Element in which content will be inserted
      */
-    function Context(container) {
-        this.container = container;
-        this._allocator = new ElementAllocator(container);
+    function Context() {
 
         this._node = new RenderNode();
         this._eventOutput = new EventHandler();
-        this._size = _getElementSize.call(this);
+        this._size = [0, 0];
 
         this._perspectiveState = new Transitionable(0);
         this._perspective = undefined;
 
         this._nodeContext = {
-            allocator: this._allocator,
             transform: Transform.identity,
             opacity: 1,
             origin: _zeroZero,
@@ -64,10 +63,6 @@ define(function(require, exports, module) {
 
     }
 
-    // Note: Unused
-    Context.prototype.getAllocator = function getAllocator() {
-        return this._allocator;
-    };
 
     /**
      * Add renderables to this Context's render tree.
@@ -89,16 +84,14 @@ define(function(require, exports, module) {
      * @param {Node} container Element to which content will be migrated
      */
     Context.prototype.migrate = function migrate(container) {
-        if (container === this.container) return;
-        this.container = container;
-        this._allocator.migrate(container);
+        throw new Error('not supported');
     };
 
     /**
      *  Cleans up all the RenderNode
      */
-    Context.prototype.cleanup = function cleanup() {
-        this._node.cleanup(this._allocator);
+    Context.prototype.cleanup = function cleanup(allocator) {
+        this._node.cleanup(allocator);
     };
 
     /**
@@ -125,6 +118,18 @@ define(function(require, exports, module) {
         this._size[1] = size[1];
     };
 
+  /**
+   * Marks the context as having a stationary root being the given elementAllocator
+   * @param elementAllocator
+   */
+  Context.prototype.setPermanentElementAllocator = function update(elementAllocator) {
+    if(this._permanentAllocator){
+      throw new Error('Cannot reset the permament element allocator!');
+    }
+      this._permanentAllocator = elementAllocator;
+      this._nodeContext.allocator = elementAllocator;
+    };
+
     /**
      * Commit this Context's content changes to the document.
      *
@@ -139,10 +144,15 @@ define(function(require, exports, module) {
             if (contextParameters.origin) this._nodeContext.origin = contextParameters.origin;
             if (contextParameters.align) this._nodeContext.align = contextParameters.align;
             if (contextParameters.size) this._nodeContext.size = contextParameters.size;
+            if (contextParameters.allocator) {
+              this._nodeContext.allocator = contextParameters.allocator;
+            } else {
+              this._nodeContext.allocator = this._permanentAllocator;
+            }
         }
         var perspective = this._perspectiveState.get();
         if (perspective !== this._perspective) {
-            _setPerspective(this.container, perspective);
+            _setPerspective(this._nodeContext.allocator.container, perspective);
             this._perspective = perspective;
         }
 

@@ -31,9 +31,11 @@ define(function (require, exports, module) {
     };
 
   /**
-   * The top-level container for a Famous-renderable piece of the document.
-   *   It is directly updated by the process-wide Engine object, and manages one
-   *   render tree root, which can contain other renderables.
+   * A context is a group of renderables, representing one hierarchy level in the DOM.
+   * Every Famous app has at least one context, which is the root context. The engine
+   * can have multiple contexts, and Groups will create new contexts to nest things further.
+   * The Context is not strictly bound to a specific point in the DOM, unless setPermanentElementAllocator()
+   * is called. Otherwise, the context can be rendered dynamically in different parts of the document.
    *
    * @class Context
    * @constructor

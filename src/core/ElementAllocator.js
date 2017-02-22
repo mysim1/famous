@@ -23,8 +23,8 @@ define(function (require, exports, module) {
   function ElementAllocator(container) {
     if (!container) container = document.createDocumentFragment();
     this.container = container;
-    this.detachedElementOutputs = {};
-    this.detachedContexts = {};
+    this.detachedHtmlElements = {};
+    this.detachedAllocators = {};
 
   }
 
@@ -70,7 +70,7 @@ define(function (require, exports, module) {
     var insertFirst = !!options.insertFirst;
     var isNested = !!options.isNested;
     type = type.toLowerCase();
-    var detachedList = isNested ? this.detachedContexts : this.detachedElementOutputs;
+    var detachedList = isNested ? this.detachedAllocators : this.detachedHtmlElements;
     if (!(type in detachedList)) detachedList[type] = [];
     var nodeStore = detachedList[type];
     var result;
@@ -78,7 +78,7 @@ define(function (require, exports, module) {
       result = nodeStore.pop();
     }
     else {
-      result = this._allocateNewElementOutput(type, insertFirst);
+      result = this._allocateNewHtmlOutput(type, insertFirst);
       if (isNested) {
         result = this._allocateNewAllocator(result);
       }
@@ -86,11 +86,24 @@ define(function (require, exports, module) {
     return result;
   };
 
+  /**
+   * Allocates an allocator to nest within the current space
+   * @param container
+   * @returns {ElementAllocator}
+   * @private
+   */
   ElementAllocator.prototype._allocateNewAllocator = function _allocateNewContext(container) {
     return new ElementAllocator(container);
   };
 
-  ElementAllocator.prototype._allocateNewElementOutput = function _allocateNewElementOutput(type, insertFirst) {
+  /**
+   * Allocates a DOM element
+   * @param type
+   * @param insertFirst
+   * @returns {Element}
+   * @private
+   */
+  ElementAllocator.prototype._allocateNewHtmlOutput = function _allocateNewElementOutput(type, insertFirst) {
     var result = document.createElement(type);
     if (insertFirst) {
       this.container.insertBefore(result, this.container.firstChild);
@@ -100,12 +113,15 @@ define(function (require, exports, module) {
     return result;
   };
 
+  /**
+   * Deallocates an allocator nested within this allocator and stores it for later usage.
+   * @param allocator
+   */
   ElementAllocator.prototype.deallocateAllocator = function deallocateAllocator(allocator) {
     var elementToDeallocate = allocator.container;
     var nodeType = elementToDeallocate.nodeName.toLocaleLowerCase();
-    var nodeStore = this.detachedContexts[nodeType];
+    var nodeStore = this.detachedAllocators[nodeType];
     nodeStore.push(allocator);
-    // this._deallocateElementOfType(elementToDeallocate, nodeType);
   };
   /**
    * De-allocate an element of specified type to the pool.
@@ -118,12 +134,9 @@ define(function (require, exports, module) {
 
   ElementAllocator.prototype.deallocate = function deallocate(element) {
     var nodeType = element.nodeName.toLowerCase();
-    var nodeStore = this.detachedElementOutputs[nodeType];
+    var nodeStore = this.detachedHtmlElements[nodeType];
     nodeStore.push(element);
   };
-
-  
-
 
   module.exports = ElementAllocator;
 });

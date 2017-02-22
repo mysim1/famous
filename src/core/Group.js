@@ -111,12 +111,11 @@ define(function (require, exports, module) {
   };
 
 
-  Group.prototype.deallocate = function deallocate(allocator){
+  Group.prototype.deallocate = function deallocate(allocator) {
     this.context.cleanup(this._allocator);
     return allocator.deallocateAllocator(this._allocator);
     this._allocator = {};
   };
-
 
 
   /**

@@ -7,104 +7,136 @@
  * @copyright Famous Industries, Inc. 2015
  */
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
+  var Context = require('./Context.js');
 
-    /**
-     * Internal helper object to Context that handles the process of
-     *   creating and allocating DOM elements within a managed div.
-     *   Private.
-     *
-     * @class ElementAllocator
-     * @constructor
-     * @private
-     * @param {Node} container document element in which Famo.us content will be inserted
-     */
-    function ElementAllocator(container) {
-        if (!container) container = document.createDocumentFragment();
-        this.container = container;
-        this.detachedNodes = {};
-        this.nodeCount = 0;
+  /**
+   * Internal helper object to Context that handles the process of
+   *   creating and allocating DOM elements within a managed div.
+   *   Private.
+   *
+   * @class ElementAllocator
+   * @constructor
+   * @private
+   * @param {Node} container document element in which Famo.us content will be inserted
+   */
+  function ElementAllocator(container) {
+    if (!container) container = document.createDocumentFragment();
+    this.container = container;
+    this.detachedHtmlElements = {};
+    this.detachedAllocators = {};
+
+  }
+
+  /**
+   * Move the document elements from their original container to a new one.
+   *
+   * @private
+   * @method migrate
+   *
+   * @param {Node} container document element to which Famo.us content will be migrated
+   */
+  ElementAllocator.prototype.migrate = function migrate(container) {
+    throw new Error('not supported');
+    var oldContainer = this.container;
+    if (container === oldContainer) return;
+
+    if (oldContainer instanceof DocumentFragment) {
+      container.appendChild(oldContainer);
+    }
+    else {
+      while (oldContainer.hasChildNodes()) {
+        container.appendChild(oldContainer.firstChild);
+      }
     }
 
-    /**
-     * Move the document elements from their original container to a new one.
-     *
-     * @private
-     * @method migrate
-     *
-     * @param {Node} container document element to which Famo.us content will be migrated
-     */
-    ElementAllocator.prototype.migrate = function migrate(container) {
-        var oldContainer = this.container;
-        if (container === oldContainer) return;
+    this.container = container;
+  };
 
-        if (oldContainer instanceof DocumentFragment) {
-            container.appendChild(oldContainer);
-        }
-        else {
-            while (oldContainer.hasChildNodes()) {
-                container.appendChild(oldContainer.firstChild);
-            }
-        }
+  /**
+   * Allocate an element of specified type from the pool.
+   *
+   * @private
+   * @method allocate
+   *
+   * @param {String} options.type type of element, e.g. 'div'
+   * @param {Boolean} options.insertFirst Whether it should be allocated from the top instead of the bottom
+   * or at the end. Defaults to false (at the bottom).
+   * @param {Boolean} options.isNested Whether it should allocate a node that already is nested (treated separately)
+   * @return {Node} allocated document element
+   */
+  ElementAllocator.prototype.allocate = function allocate(options) {
+    var type = options.type.toLocaleLowerCase();
+    var insertFirst = !!options.insertFirst;
+    var isNested = !!options.isNested;
+    type = type.toLowerCase();
+    var detachedList = isNested ? this.detachedAllocators : this.detachedHtmlElements;
+    if (!(type in detachedList)) detachedList[type] = [];
+    var nodeStore = detachedList[type];
+    var result;
+    if (nodeStore.length > 0 && !insertFirst) {
+      result = nodeStore.pop();
+    }
+    else {
+      result = this._allocateNewHtmlOutput(type, insertFirst);
+      if (isNested) {
+        result = this._allocateNewAllocator(result);
+      }
+    }
+    return result;
+  };
 
-        this.container = container;
-    };
+  /**
+   * Allocates an allocator to nest within the current space
+   * @param container
+   * @returns {ElementAllocator}
+   * @private
+   */
+  ElementAllocator.prototype._allocateNewAllocator = function _allocateNewContext(container) {
+    return new ElementAllocator(container);
+  };
 
-    /**
-     * Allocate an element of specified type from the pool.
-     *
-     * @private
-     * @method allocate
-     *
-     * @param {string} type type of element, e.g. 'div'
-     * @return {Node} allocated document element
-     */
-    ElementAllocator.prototype.allocate = function allocate(type, insertFirst) {
-        type = type.toLowerCase();
-        if (!(type in this.detachedNodes)) this.detachedNodes[type] = [];
-        var nodeStore = this.detachedNodes[type];
-        var result;
-        if (nodeStore.length > 0 && !insertFirst) {
-            result = nodeStore.pop();
-        }
-        else {
-            result = document.createElement(type);
-            if(insertFirst){
-              this.container.insertBefore(result, this.container.firstChild);
-            } else {
-              this.container.appendChild(result);
-            }
-        }
-        this.nodeCount++;
-        return result;
-    };
+  /**
+   * Allocates a DOM element
+   * @param type
+   * @param insertFirst
+   * @returns {Element}
+   * @private
+   */
+  ElementAllocator.prototype._allocateNewHtmlOutput = function _allocateNewElementOutput(type, insertFirst) {
+    var result = document.createElement(type);
+    if (insertFirst) {
+      this.container.insertBefore(result, this.container.firstChild);
+    } else {
+      this.container.appendChild(result);
+    }
+    return result;
+  };
 
-    /**
-     * De-allocate an element of specified type to the pool.
-     *
-     * @private
-     * @method deallocate
-     *
-     * @param {Node} element document element to deallocate
-     */
-    ElementAllocator.prototype.deallocate = function deallocate(element) {
-        var nodeType = element.nodeName.toLowerCase();
-        var nodeStore = this.detachedNodes[nodeType];
-        nodeStore.push(element);
-        this.nodeCount--;
-    };
+  /**
+   * Deallocates an allocator nested within this allocator and stores it for later usage.
+   * @param allocator
+   */
+  ElementAllocator.prototype.deallocateAllocator = function deallocateAllocator(allocator) {
+    var elementToDeallocate = allocator.container;
+    var nodeType = elementToDeallocate.nodeName.toLocaleLowerCase();
+    var nodeStore = this.detachedAllocators[nodeType];
+    nodeStore.push(allocator);
+  };
+  /**
+   * De-allocate an element of specified type to the pool.
+   *
+   * @private
+   * @method deallocate
+   *
+   * @param {Node} element document element to deallocate
+   */
 
-    /**
-     * Get count of total allocated nodes in the document.
-     *
-     * @private
-     * @method getNodeCount
-     *
-     * @return {Number} total node count
-     */
-    ElementAllocator.prototype.getNodeCount = function getNodeCount() {
-        return this.nodeCount;
-    };
+  ElementAllocator.prototype.deallocate = function deallocate(element) {
+    var nodeType = element.nodeName.toLowerCase();
+    var nodeStore = this.detachedHtmlElements[nodeType];
+    nodeStore.push(element);
+  };
 
-    module.exports = ElementAllocator;
+  module.exports = ElementAllocator;
 });

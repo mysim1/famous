@@ -73,128 +73,128 @@ define(function (require, exports, module) {
     this._attributesDirty = true;
   };
 
-  /**
-   * Get HTML attributes on this Surface.
-   *
-   * @method getAttributes
-   *
-   * @return {Object} Dictionary of this Surface's attributes.
-   */
-  Surface.prototype.getAttributes = function getAttributes() {
-    return this.attributes;
-  };
+    /**
+     * Get HTML attributes on this Surface.
+     *
+     * @method getAttributes
+     *
+     * @return {Object} Dictionary of this Surface's attributes.
+     */
+    Surface.prototype.getAttributes = function getAttributes() {
+        return this.attributes;
+    };
 
-  /**
-   * Removes existing attributes from this Surface (e.g. needed for 'disabled').
-   * @method removeAttributes
-   * @param {Array} attributes List of attribute names to remove
-   */
-  Surface.prototype.removeAttributes = function removeAttributes(attributes) {
-    for (var index in attributes) {
-      var name = attributes[index];
-      delete this.attributes[name];
-      this._dirtyAttributes.push(name);
-    }
-    this._attributesDirty = true;
-  };
+    /**
+     * Removes existing attributes from this Surface (e.g. needed for 'disabled').
+     * @method removeAttributes
+     * @param {Array} attributes List of attribute names to remove
+     */
+    Surface.prototype.removeAttributes = function removeAttributes(attributes) {
+        for(var index in attributes) {
+            var name = attributes[index];
+            delete this.attributes[name];
+            this._dirtyAttributes.push(name);
+        }
+        this._attributesDirty = true;
+    };
 
-  /**
-   * Set CSS-style properties on this Surface. Note that this will cause
-   *    dirtying and thus re-rendering, even if values do not change.
-   *
-   * @method setProperties
-   * @chainable
-   * @param {Object} properties property dictionary of "key" => "value"
-   */
-  Surface.prototype.setProperties = function setProperties(properties) {
-    for (var n in properties) {
-      this.properties[n] = properties[n];
-    }
-    this._stylesDirty = true;
-    return this;
-  };
+    /**
+     * Set CSS-style properties on this Surface. Note that this will cause
+     *    dirtying and thus re-rendering, even if values do not change.
+     *
+     * @method setProperties
+     * @chainable
+     * @param {Object} properties property dictionary of "key" => "value"
+     */
+    Surface.prototype.setProperties = function setProperties(properties) {
+        for (var n in properties) {
+            this.properties[n] = properties[n];
+        }
+        this._stylesDirty = true;
+        return this;
+    };
 
-  /**
-   * Get CSS-style properties on this Surface.
-   *
-   * @method getProperties
-   *
-   * @return {Object} Dictionary of this Surface's properties.
-   */
-  Surface.prototype.getProperties = function getProperties() {
-    return this.properties;
-  };
+    /**
+     * Get CSS-style properties on this Surface.
+     *
+     * @method getProperties
+     *
+     * @return {Object} Dictionary of this Surface's properties.
+     */
+    Surface.prototype.getProperties = function getProperties() {
+        return this.properties;
+    };
 
-  /**
-   * Add CSS-style class to the list of classes on this Surface. Note
-   *   this will map directly to the HTML property of the actual
-   *   corresponding rendered <div>.
-   *
-   * @method addClass
-   * @chainable
-   * @param {string} className name of class to add
-   */
-  Surface.prototype.addClass = function addClass(className) {
-    if (this.classList.indexOf(className) < 0) {
-      this.classList.push(className);
-      this._classesDirty = true;
-    }
-    return this;
-  };
+    /**
+     * Add CSS-style class to the list of classes on this Surface. Note
+     *   this will map directly to the HTML property of the actual
+     *   corresponding rendered <div>.
+     *
+     * @method addClass
+     * @chainable
+     * @param {string} className name of class to add
+     */
+    Surface.prototype.addClass = function addClass(className) {
+        if (this.classList.indexOf(className) < 0) {
+            this.classList.push(className);
+            this._classesDirty = true;
+        }
+        return this;
+    };
 
-  /**
-   * Remove CSS-style class from the list of classes on this Surface.
-   *   Note this will map directly to the HTML property of the actual
-   *   corresponding rendered <div>.
-   *
-   * @method removeClass
-   * @chainable
-   * @param {string} className name of class to remove
-   */
-  Surface.prototype.removeClass = function removeClass(className) {
-    var i = this.classList.indexOf(className);
-    if (i >= 0) {
-      this._dirtyClasses.push(this.classList.splice(i, 1)[0]);
-      this._classesDirty = true;
-    }
-    return this;
-  };
+    /**
+     * Remove CSS-style class from the list of classes on this Surface.
+     *   Note this will map directly to the HTML property of the actual
+     *   corresponding rendered <div>.
+     *
+     * @method removeClass
+     * @chainable
+     * @param {string} className name of class to remove
+     */
+    Surface.prototype.removeClass = function removeClass(className) {
+        var i = this.classList.indexOf(className);
+        if (i >= 0) {
+            this._dirtyClasses.push(this.classList.splice(i, 1)[0]);
+            this._classesDirty = true;
+        }
+        return this;
+    };
 
-  /**
-   * Toggle CSS-style class from the list of classes on this Surface.
-   *   Note this will map directly to the HTML property of the actual
-   *   corresponding rendered <div>.
-   *
-   * @method toggleClass
-   * @param {string} className name of class to toggle
-   */
-  Surface.prototype.toggleClass = function toggleClass(className) {
-    var i = this.classList.indexOf(className);
-    if (i >= 0) {
-      this.removeClass(className);
-    } else {
-      this.addClass(className);
-    }
-    return this;
-  };
+    /**
+     * Toggle CSS-style class from the list of classes on this Surface.
+     *   Note this will map directly to the HTML property of the actual
+     *   corresponding rendered <div>.
+     *
+     * @method toggleClass
+     * @param {string} className name of class to toggle
+     */
+    Surface.prototype.toggleClass = function toggleClass(className) {
+        var i = this.classList.indexOf(className);
+        if (i >= 0) {
+            this.removeClass(className);
+        } else {
+            this.addClass(className);
+        }
+        return this;
+    };
 
-  /**
-   * Reset class list to provided dictionary.
-   * @method setClasses
-   * @chainable
-   * @param {Array.string} classList
-   */
-  Surface.prototype.setClasses = function setClasses(classList) {
-    var i = 0;
-    var removal = [];
-    for (i = 0; i < this.classList.length; i++) {
-      if (classList.indexOf(this.classList[i]) < 0) removal.push(this.classList[i]);
-    }
-    for (i = 0; i < removal.length; i++) this.removeClass(removal[i]);
-    // duplicates are already checked by addClass()
-    for (i = 0; i < classList.length; i++) this.addClass(classList[i]);
-    return this;
-  };
+    /**
+     * Reset class list to provided dictionary.
+     * @method setClasses
+     * @chainable
+     * @param {Array.string} classList
+     */
+    Surface.prototype.setClasses = function setClasses(classList) {
+        var i = 0;
+        var removal = [];
+        for (i = 0; i < this.classList.length; i++) {
+            if (classList.indexOf(this.classList[i]) < 0) removal.push(this.classList[i]);
+        }
+        for (i = 0; i < removal.length; i++) this.removeClass(removal[i]);
+        // duplicates are already checked by addClass()
+        for (i = 0; i < classList.length; i++) this.addClass(classList[i]);
+        return this;
+    };
 
   Surface.with = function (options) {
     /* Make an inherited version of the surface */
@@ -227,19 +227,19 @@ define(function (require, exports, module) {
     return this;
   };
 
-  //  Apply to document all changes from removeClass() since last setup().
-  function _cleanupClasses(target) {
-    for (var i = 0; i < this._dirtyClasses.length; i++) target.classList.remove(this._dirtyClasses[i]);
-    this._dirtyClasses = [];
-  }
-
-  // Apply values of all Famous-managed styles to the document element.
-  //  These will be deployed to the document on call to #setup().
-  function _applyStyles(target) {
-    for (var n in this.properties) {
-      target.style[n] = this.properties[n];
+    //  Apply to document all changes from removeClass() since last setup().
+    function _cleanupClasses(target) {
+        for (var i = 0; i < this._dirtyClasses.length; i++) target.classList.remove(this._dirtyClasses[i]);
+        this._dirtyClasses = [];
     }
-  }
+
+    // Apply values of all Famous-managed styles to the document element.
+    //  These will be deployed to the document on call to #setup().
+    function _applyStyles(target) {
+        for (var n in this.properties) {
+            target.style[n] = this.properties[n];
+        }
+    }
 
   // Clear all Famous-managed styles from the document element.
   // These will be deployed to the document on call to #setup().
@@ -307,8 +307,12 @@ define(function (require, exports, module) {
     this._transformDirty = true;
   };
 
-  Surface.prototype.allocate = function allocate(allocator) {
-    return allocator.allocate(this.elementType);
+  Surface.prototype.deallocate = function deallocate(allocator, target){
+    return allocator.deallocate(target);
+  };
+
+  Surface.prototype.allocate = function allocate(allocator){
+    return allocator.allocate({type: this.elementType});
   };
 
   /**
@@ -333,11 +337,11 @@ define(function (require, exports, module) {
       this._trueSizeCheck = true;
     }
 
-    if (this._stylesDirty) {
-      _applyStyles.call(this, target);
-      this._stylesDirty = false;
-      this._trueSizeCheck = true;
-    }
+        if (this._stylesDirty) {
+            _applyStyles.call(this, target);
+            this._stylesDirty = false;
+            this._trueSizeCheck = true;
+        }
 
     if (this._attributesDirty) {
       _applyAttributes.call(this, target);
@@ -406,61 +410,67 @@ define(function (require, exports, module) {
     ElementOutput.prototype.commit.call(this, context);
   };
 
-  /**
-   *  Remove all Famous-relevant attributes from a document element.
-   *    This is called by SurfaceManager's detach().
-   *    This is in some sense the reverse of .deploy().
-   *
-   * @private
-   * @method cleanup
-   * @param {ElementAllocator} allocator
-   */
-  Surface.prototype.cleanup = function cleanup(allocator) {
-    var i = 0;
-    var target = this._currentTarget;
-    this._eventOutput.emit('recall');
-    this.recall(target);
-    target.style.display = 'none';
-    target.style.opacity = '';
-    target.style.width = '';
-    target.style.height = '';
-    _cleanupStyles.call(this, target);
-    _cleanupAttributes.call(this, target);
-    var classList = this.getClassList();
-    _cleanupClasses.call(this, target);
-    for (i = 0; i < classList.length; i++) target.classList.remove(classList[i]);
-    if (this.elementClass) {
-      if (this.elementClass instanceof Array) {
-        for (i = 0; i < this.elementClass.length; i++) {
-          target.classList.remove(this.elementClass[i]);
+    /**
+     *  Remove all Famous-relevant attributes from a document element.
+     *    This is called by SurfaceManager's detach().
+     *    This is in some sense the reverse of .deploy().
+     *
+     * @private
+     * @method cleanup
+     * @param {ElementAllocator} allocator
+     */
+    Surface.prototype.cleanup = function cleanup(allocator) {
+        /* If clean-up done twice, return. This happens when a surface is cleaned up from
+         * one context (e.g. group) and needs to be removed from another context that used to
+         * display this surface. */
+        if(!this._currentTarget){
+            return;
         }
-      }
-      else {
-        target.classList.remove(this.elementClass);
-      }
-    }
-    this.detach(target);
-    this._currentTarget = null;
-    allocator.deallocate(target);
-  };
+        var i = 0;
+        var target = this._currentTarget;
+        this._eventOutput.emit('recall');
+        this.recall(target);
+        target.style.display = 'none';
+        target.style.opacity = '';
+        target.style.width = '';
+        target.style.height = '';
+        _cleanupStyles.call(this, target);
+        _cleanupAttributes.call(this, target);
+        var classList = this.getClassList();
+        _cleanupClasses.call(this, target);
+        for (i = 0; i < classList.length; i++) target.classList.remove(classList[i]);
+        if (this.elementClass) {
+            if (this.elementClass instanceof Array) {
+                for (i = 0; i < this.elementClass.length; i++) {
+                    target.classList.remove(this.elementClass[i]);
+                }
+            }
+            else {
+                target.classList.remove(this.elementClass);
+            }
+        }
+        this.detach(target);
+        this._currentTarget = null;
+        this.deallocate(allocator, target);
+    };
 
-  /**
-   * Place the document element that this component manages into the document.
-   *
-   * @private
-   * @method deploy
-   * @param {Node} target document parent of this container
-   */
-  Surface.prototype.deploy = function deploy(target) {
-    var content = this.getContent();
-    if (content instanceof Node) {
-      while (target.hasChildNodes())
-        target.removeChild(target.firstChild);
-      target.appendChild(content);
-    } else
-      target.innerHTML = content;
-    this.content = target.innerHTML;
-  };
+    /**
+     * Place the document element that this component manages into the document.
+     *
+     * @private
+     * @method deploy
+     * @param {Node} target document parent of this container
+     */
+    Surface.prototype.deploy = function deploy(target) {
+      var content = this.getContent();
+      if (content instanceof Node) {
+        while (target.hasChildNodes())
+          target.removeChild(target.firstChild);
+        target.appendChild(content);
+      } else{
+        target.innerHTML = content;
+      }this.content = target.innerHTML;
+    };
 
   /**
    * FIX for famous-bug: https://github.com/Famous/famous/issues/673
@@ -482,28 +492,28 @@ define(function (require, exports, module) {
     }
   };
 
-  /**
-   *  Get the x and y dimensions of the surface.
-   *
-   * @method getSize
-   * @return {Array.Number} [x,y] size of surface
-   */
-  Surface.prototype.getSize = function getSize() {
-    return this._size ? this._size : this.size;
-  };
+    /**
+     *  Get the x and y dimensions of the surface.
+     *
+     * @method getSize
+     * @return {Array.Number} [x,y] size of surface
+     */
+    Surface.prototype.getSize = function getSize() {
+        return this._size ? this._size : this.size;
+    };
 
-  /**
-   * Set x and y dimensions of the surface.
-   *
-   * @method setSize
-   * @chainable
-   * @param {Array.Number} size as [width, height]
-   */
-  Surface.prototype.setSize = function setSize(size) {
-    this.size = size ? [size[0], size[1]] : null;
-    this._sizeDirty = true;
-    return this;
-  };
+    /**
+     * Set x and y dimensions of the surface.
+     *
+     * @method setSize
+     * @chainable
+     * @param {Array.Number} size as [width, height]
+     */
+    Surface.prototype.setSize = function setSize(size) {
+        this.size = size ? [size[0], size[1]] : null;
+        this._sizeDirty = true;
+        return this;
+    };
 
 
   /**

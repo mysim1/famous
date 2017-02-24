@@ -28,7 +28,7 @@ define(function(require, exports, module) {
      */
     function ElementOutput(element) {
         this._matrix = null;
-        this._opacity = 1;
+        // this._opacity = 1;
         this._origin = null;
         this._size = null;
 
@@ -196,7 +196,9 @@ define(function(require, exports, module) {
     }
     else {
         _setMatrix = function(element, matrix) {
-            element.style.transform = _formatCSSTransform(matrix);
+            var interpretation = Transform.interpret(matrix);
+            var translate = 'translate(' + interpretation.translate[0] + 'px, '+ interpretation.translate[1] + 'px)';
+            element.style.transform = translate
         };
     }
 
@@ -208,18 +210,18 @@ define(function(require, exports, module) {
     // Directly apply given origin coordinates to the document element as the
     // appropriate webkit CSS style.
     var _setOrigin = usePrefix ? function(element, origin) {
-        element.style.webkitTransformOrigin = _formatCSSOrigin(origin);
+        // element.style.webkitTransformOrigin = _formatCSSOrigin(origin);
     } : function(element, origin) {
-        element.style.transformOrigin = _formatCSSOrigin(origin);
+        // element.style.transformOrigin = _formatCSSOrigin(origin);
     };
 
     // Shrink given document element until it is effectively invisible.
     var _setInvisible = usePrefix ? function(element) {
         element.style.webkitTransform = 'scale3d(0.0001,0.0001,0.0001)';
-        element.style.opacity = 0;
+        // element.style.opacity = 1;
     } : function(element) {
         element.style.transform = 'scale3d(0.0001,0.0001,0.0001)';
-        element.style.opacity = 0;
+        // element.style.opacity = 0;
     };
 
     function _xyNotEquals(a, b) {
@@ -261,7 +263,7 @@ define(function(require, exports, module) {
 
         if (this._opacity !== opacity) {
             this._opacity = opacity;
-            target.style.opacity = (opacity >= 1) ? '0.999999' : opacity;
+            // target.style.opacity = (opacity >= 1) ? '0.999999' : opacity;
         }
 
         if (this._transformDirty || this._originDirty || this._sizeDirty) {

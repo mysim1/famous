@@ -104,12 +104,13 @@ define(function(require, exports, module) {
     function _applyCommit(spec, context, cacheStorage) {
         var result = SpecParser.parse(spec, context);
         var keys = Object.keys(result);
-        for (var i = 0; i < keys.length; i++) {
+        for (var i = 0; i < keys.length; i++) { // Loop over the results in the specific view
             var id = keys[i];
             var childNode = Entity.get(id);
             var commitParams = result[id];
             commitParams.allocator = context.allocator;
-            var commitResult = childNode.commit(commitParams);
+            var commitResult = childNode.commit(commitParams); // Gets the instructions on what to display
+            //Calls recursively to display what is instructed
             if (commitResult) _applyCommit(commitResult, context, cacheStorage);
             else cacheStorage[id] = commitParams;
         }

@@ -41,8 +41,15 @@ define(function(require, exports, module) {
     }
     var handlers = this.listeners[type];
     if (handlers) {
-      for (var i = 0; i < handlers.length; i++) {
+      var handlerLength = handlers.length;
+      var i = 0;
+      while(i < handlerLength){
         handlers[i].apply(this._owner, args);
+        if(handlers.length === handlerLength){
+          i++;
+        } else { /* The handlers changed length, must have been a once() listener */
+          handlerLength = handlers.length;
+        }
       }
     }
     return this;

@@ -25,6 +25,7 @@ define(function (require, exports, module) {
    * @class Engine
    */
   var Context = require('./Context');
+  var ElementAllocator = require('./ElementAllocator');
   var EventHandler = require('./EventHandler');
   var OptionsManager = require('./OptionsManager');
 
@@ -113,7 +114,8 @@ define(function (require, exports, module) {
     }
     else loopEnabled = false;
   }
-  if(typeof window !== 'undefined'){
+
+  if (typeof window !== 'undefined') {
     window.requestAnimationFrame(loop);
   }
 
@@ -130,7 +132,7 @@ define(function (require, exports, module) {
     eventHandler.emit('resize');
   }
 
-  if(typeof window !== 'undefined') {
+  if (typeof window !== 'undefined') {
 
     window.addEventListener('resize', handleResize, false);
     handleResize();
@@ -142,7 +144,7 @@ define(function (require, exports, module) {
   Engine.touchMoveEnabled = false;
 
   Engine.enableTouchMove = function enableTouchMove() {
-    if(!this.touchMoveEnabled){
+    if (!this.touchMoveEnabled) {
       console.log("Warning: Touch move enabled. Outcomes might be unwated");
     }
     this.touchMoveEnabled = true;
@@ -340,7 +342,8 @@ define(function (require, exports, module) {
       needMountContainer = true;
     }
 
-    var context = new Context(el);
+    var context = new Context();
+    context.setPermanentElementAllocator(new ElementAllocator(el));
     Engine.registerContext(context);
 
     if (needMountContainer) mount(context, el);

@@ -45,6 +45,7 @@ define(function(require, exports, module) {
         this._trueSizeCheck = true;
 
         this._dirtyClasses = [];
+        this._dirtyAttributes = [];
 
         if (options) this.setOptions(options);
 
@@ -79,6 +80,20 @@ define(function(require, exports, module) {
      */
     Surface.prototype.getAttributes = function getAttributes() {
         return this.attributes;
+    };
+
+    /**
+     * Removes existing attributes from this Surface (e.g. needed for 'disabled').
+     * @method removeAttributes
+     * @param {Array} attributes List of attribute names to remove
+     */
+    Surface.prototype.removeAttributes = function removeAttributes(attributes) {
+        for(var index in attributes) {
+            var name = attributes[index];
+            delete this.attributes[name];
+            this._dirtyAttributes.push(name);
+        }
+        this._attributesDirty = true;
     };
 
     /**
@@ -254,11 +269,16 @@ define(function(require, exports, module) {
         }
     }
 
-    // Apply values of all Famous-managed attributes to the document element.
+    //  Apply values of all Famous-managed attributes to the document element.
     //  These will be deployed to the document on call to #setup().
     function _applyAttributes(target) {
         for (var n in this.attributes) {
             target.setAttribute(n, this.attributes[n]);
+        }
+        for (var index in this._dirtyAttributes) {
+            var name = this._dirtyAttributes[index];
+            target.removeAttribute(name);
+            this._dirtyAttributes.shift();
         }
     }
 
@@ -283,7 +303,7 @@ define(function(require, exports, module) {
      * @param {ElementAllocator} allocator document element pool for this context
      */
     Surface.prototype.setup = function setup(allocator) {
-        var target = allocator.allocate(this.elementType);
+        var target =  this.allocate(allocator);
         if (this.elementClass) {
             if (this.elementClass instanceof Array) {
                 for (var i = 0; i < this.elementClass.length; i++) {
@@ -306,6 +326,14 @@ define(function(require, exports, module) {
         this._originDirty = true;
         this._transformDirty = true;
     };
+
+  Surface.prototype.deallocate = function deallocate(allocator, target){
+    return allocator.deallocate(target);
+  };
+
+  Surface.prototype.allocate = function allocate(allocator){
+    return allocator.allocate({type: this.elementType});
+  };
 
     /**
      * Apply changes from this component to the corresponding document element.
@@ -385,8 +413,8 @@ define(function(require, exports, module) {
 
         if (this._sizeDirty) {
             if (this._size) {
-              target.style.width = this.size && this.size[0] === true  || this._size[0] == true ? '' : this._size[0] + 'px';
-              target.style.height = this.size && this.size[1] === true || this._size[1] == true ? '' : this._size[1] + 'px';
+              target.style.width = this.size && this.size[0] === true  || this._size[0] === true ? '' : this._size[0] + 'px';
+              target.style.height = this.size && this.size[1] === true || this._size[1] === true ? '' : this._size[1] + 'px';
             }
 
             this._eventOutput.emit('resize');
@@ -412,6 +440,12 @@ define(function(require, exports, module) {
      * @param {ElementAllocator} allocator
      */
     Surface.prototype.cleanup = function cleanup(allocator) {
+        /* If clean-up done twice, return. This happens when a surface is cleaned up from
+         * one context (e.g. group) and needs to be removed from another context that used to
+         * display this surface. */
+        if(!this._currentTarget){
+            return;
+        }
         var i = 0;
         var target = this._currentTarget;
         this._eventOutput.emit('recall');
@@ -437,7 +471,7 @@ define(function(require, exports, module) {
         }
         this.detach(target);
         this._currentTarget = null;
-        allocator.deallocate(target);
+        this.deallocate(allocator, target);
     };
 
     /**
@@ -453,8 +487,9 @@ define(function(require, exports, module) {
         while (target.hasChildNodes())
           target.removeChild(target.firstChild);
         target.appendChild(content);
-      } else
+      } else {
         target.innerHTML = content;
+      }
       this.content = target.innerHTML;
     };
 

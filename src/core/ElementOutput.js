@@ -64,6 +64,13 @@ define(function(require, exports, module) {
         this._eventOutput.on(type, fn);
     };
 
+  ElementOutput.prototype.once = function on(type, fn) {
+      if (this._element) this._element.addEventListener(type, this.eventForwarder);
+      this._eventOutput.once(type, fn);
+    };
+
+
+
     /**
      * Unbind an event by type and handler.
      *   This undoes the work of "on"

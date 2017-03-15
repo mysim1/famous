@@ -23,8 +23,8 @@ define(function(require, exports, module) {
      * @param {string} [options.value] value of text
      */
     function InputSurface(options) {
-        this._placeholder = options.placeholder || '';
-        this._value       = options.value || '';
+        this._placeholder = options.placeholder !== undefined ? options.placeholder : '';
+        this._value       = options.value !== undefined ? options.value : '';
         this._type        = options.type || 'text';
         this._name        = options.name || '';
 

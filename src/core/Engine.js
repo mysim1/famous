@@ -115,9 +115,11 @@ define(function (require, exports, module) {
     for (i = 0; i < contexts.length; i++) contexts[i].update();
 
     let timeMeasured = (Date.now() - currentTime);
-    let idealTime = 31;
+    let idealTime = 16.6667 * 3 - 2;
     if(timeMeasured < idealTime){
       pauseComputer(idealTime - timeMeasured);
+    } else {
+      console.log("warning: Frame is taking too long");
     }
 
     eventHandler.emit('postrender');

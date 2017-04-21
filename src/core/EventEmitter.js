@@ -69,13 +69,16 @@ define(function(require, exports, module) {
    * Listens once
    * @param type
    * @param handler
-   * @returns {EventHandler}
+   * @returns {Promise}
    */
   EventEmitter.prototype.once = function once(type, handler) {
-    return this.on(type, function onceWrapper() {
-      this.removeListener(type, onceWrapper);
-      handler.apply(this._owner,arguments);
-    }, this);
+    return new Promise((resolve) => {
+      this.on(type, function onceWrapper() {
+        this.removeListener(type, onceWrapper);
+        handler && handler.apply(this._owner, arguments);
+        resolve(...arguments);
+      }, this);
+    });
   };
 
   /**

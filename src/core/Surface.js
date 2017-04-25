@@ -67,6 +67,11 @@ define(function(require, exports, module) {
         for (var n in attributes) {
             if (n === 'style') throw new Error('Cannot set styles via "setAttributes" as it will break Famo.us.  Use "setProperties" instead.');
             this.attributes[n] = attributes[n];
+            /* Remove the attribute that is about to be removed, if applicable */
+            var attributeToBeRemovedIndex = this._dirtyAttributes.indexOf(n);
+            if(attributeToBeRemovedIndex !== -1){
+              this._dirtyAttributes.splice(attributeToBeRemovedIndex, 1);
+            }
         }
         this._attributesDirty = true;
     };

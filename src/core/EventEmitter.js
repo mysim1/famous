@@ -76,7 +76,7 @@ define(function(require, exports, module) {
       this.on(type, function onceWrapper() {
         this.removeListener(type, onceWrapper);
         handler && handler.apply(this._owner, arguments);
-        resolve(...arguments);
+        resolve.apply(null, arguments)
       }, this);
     });
   };

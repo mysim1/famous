@@ -86,6 +86,10 @@ define(function(require, exports, module) {
     for (i = 0; i < this.downstreamFn.length; i++) {
       this.downstreamFn[i](type, event);
     }
+    if(this._buffer){
+      this._buffer[type] = this._buffer[type] || [];
+      this._buffer[type].push(arguments);
+    }
     return this;
   };
 
@@ -95,7 +99,18 @@ define(function(require, exports, module) {
    */
   EventHandler.prototype.trigger = EventHandler.prototype.emit;
 
-  /**
+  EventHandler.prototype.flush = function flush() {
+    var buffer = this._buffer;
+    this._buffer = null;
+    return buffer;
+  };
+
+  EventHandler.prototype.recordEvents = function recordEvents() {
+    this._buffer = {};
+  };
+
+
+    /**
    * Add event handler object to set of downstream handlers.
    *
    * @method pipe

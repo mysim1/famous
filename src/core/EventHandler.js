@@ -167,8 +167,7 @@ define(function(require, exports, module) {
    * @returns {EventHandler}
    */
   EventHandler.prototype.once = function on(type, handler) {
-    EventEmitter.prototype.once.apply(this, arguments);
-    return this;
+    return EventEmitter.prototype.once.apply(this, arguments);
   };
 
   /**

@@ -41,15 +41,9 @@ define(function(require, exports, module) {
     }
     var handlers = this.listeners[type];
     if (handlers) {
-      var handlerLength = handlers.length;
-      var i = 0;
-      while(i < handlerLength){
+      handlers = Array.from(handlers);
+      for (var i = 0; i < handlers.length; i++) {
         handlers[i].apply(this._owner, args);
-        if(handlers.length === handlerLength){
-          i++;
-        } else { /* The handlers changed length, must have been a once() listener */
-          handlerLength = handlers.length;
-        }
       }
     }
     return this;
@@ -75,13 +69,16 @@ define(function(require, exports, module) {
    * Listens once
    * @param type
    * @param handler
-   * @returns {EventHandler}
+   * @returns {Promise}
    */
   EventEmitter.prototype.once = function once(type, handler) {
-    return this.on(type, function onceWrapper() {
-      this.removeListener(type, onceWrapper);
-      handler.apply(this._owner,arguments);
-    }, this);
+    return new Promise((resolve) => {
+      this.on(type, function onceWrapper() {
+        this.removeListener(type, onceWrapper);
+        handler && handler.apply(this._owner, arguments);
+        resolve.apply(null, arguments)
+      }, this);
+    });
   };
 
   /**

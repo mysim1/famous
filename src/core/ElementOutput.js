@@ -170,10 +170,7 @@ define(function(require, exports, module) {
 
         var result = 'matrix3d(';
         for (var i = 0; i < 15; i++) {
-            var shouldOperationBeRounded = ![0, 5, 10].includes(i);
-            result += (m[i] < 0.000001 && m[i] > -0.000001) ? '0,' :
-              (shouldOperationBeRounded ? Math.round(m[i]) : m[i])
-              + ',';
+            result += (m[i] < 0.000001 && m[i] > -0.000001) ? '0,' : m[i] + ',';
         }
         result += m[15] + ')';
         return result;

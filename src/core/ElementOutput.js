@@ -28,7 +28,6 @@ define(function(require, exports, module) {
      */
     function ElementOutput(element) {
         this._matrix = null;
-        // this._opacity = 1;
         this._origin = null;
         this._size = null;
 
@@ -218,10 +217,10 @@ define(function(require, exports, module) {
     // Shrink given document element until it is effectively invisible.
     var _setInvisible = usePrefix ? function(element) {
         element.style.webkitTransform = 'scale3d(0.0001,0.0001,0.0001)';
-        // element.style.opacity = 1;
+        element.style.opacity = 1;
     } : function(element) {
         element.style.transform = 'scale3d(0.0001,0.0001,0.0001)';
-        // element.style.opacity = 0;
+        element.style.opacity = 0;
     };
 
     function _xyNotEquals(a, b) {
@@ -263,7 +262,7 @@ define(function(require, exports, module) {
 
         if (this._opacity !== opacity) {
             this._opacity = opacity;
-            // target.style.opacity = (opacity >= 1) ? '0.999999' : opacity;
+            target.style.opacity = (opacity >= 1) ? '0.999999' : opacity;
         }
 
         if (this._transformDirty || this._originDirty || this._sizeDirty) {

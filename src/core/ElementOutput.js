@@ -170,12 +170,14 @@ define(function(require, exports, module) {
 
         var result = 'matrix3d(';
         for (var i = 0; i < 15; i++) {
-            result += (m[i] < 0.000001 && m[i] > -0.000001) ? '0,' : m[i] + ',';
+            var shouldOperationBeRounded = ![0, 5, 10].includes(i);
+            result += (m[i] < 0.000001 && m[i] > -0.000001) ? '0,' :
+              (shouldOperationBeRounded ? Math.round(m[i]) : m[i])
+              + ',';
         }
         result += m[15] + ')';
         return result;
     }
-
     /**
      * Directly apply given FamousMatrix to the document element as the
      *   appropriate webkit CSS style.
@@ -302,7 +304,23 @@ define(function(require, exports, module) {
      */
     ElementOutput.prototype.attach = function attach(target) {
         this._element = target;
-        _addEventListeners.call(this, target);
+
+      // create an observer instance
+      var observer = new MutationObserver((mutations) =>{
+        if(window.observeAll){
+          debugger;
+        }
+
+      });
+
+    // configuration of the observer:
+      var config = { attributes: true, childList: true, characterData: true, attributeOldValue: true };
+
+      // pass in the target node, as well as the observer options
+      observer.observe(target, config);
+
+
+      _addEventListeners.call(this, target);
     };
 
     /**

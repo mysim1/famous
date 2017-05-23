@@ -131,7 +131,9 @@ define(function(require, exports, module) {
             var nextSizeContext = sizeContext;
 
             if (spec.opacity !== undefined) opacity = parentContext.opacity * spec.opacity;
-            if (spec.transform) transform = Transform.multiply(parentContext.transform, spec.transform);
+            if (spec.hide) transform = Transform.scale(0, 0, 0);
+            else if (spec.transform) transform = Transform.multiply(parentContext.transform, spec.transform);
+
             if (spec.origin) {
                 origin = spec.origin;
                 nextSizeContext = parentContext.transform;

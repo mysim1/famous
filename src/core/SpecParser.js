@@ -99,13 +99,15 @@ define(function(require, exports, module) {
 
         if (typeof spec === 'number') {
             id = spec;
-            transform = parentContext.transform;
+            var hide = parentContext.hide || parentContext.opacity === 0;
+            transform = hide ? Transform.scale(0, 0, 0) : parentContext.transform;
             align = parentContext.align || _zeroZero;
             if (parentContext.size && align && (align[0] || align[1])) {
                 var alignAdjust = [align[0] * parentContext.size[0], align[1] * parentContext.size[1], 0];
                 transform = Transform.thenMove(transform, _vecInContext(alignAdjust, sizeContext));
             }
             this.result[id] = {
+                hide: hide,
                 transform: transform,
                 opacity: parentContext.opacity,
                 origin: parentContext.origin || _zeroZero,
@@ -128,10 +130,12 @@ define(function(require, exports, module) {
             origin = parentContext.origin;
             align = parentContext.align;
             size = parentContext.size;
+            /* If parent is hidden, also this element should be hidden */
+            var hide = spec.hide || parentContext.hide || opacity === 0;
             var nextSizeContext = sizeContext;
 
             if (spec.opacity !== undefined) opacity = parentContext.opacity * spec.opacity;
-            if (spec.hide) transform = Transform.scale(0, 0, 0);
+            if (hide) transform = Transform.scale(0, 0, 0);
             else if (spec.transform) transform = Transform.multiply(parentContext.transform, spec.transform);
 
             if (spec.origin) {
@@ -169,7 +173,8 @@ define(function(require, exports, module) {
                 opacity: opacity,
                 origin: origin,
                 align: align,
-                size: size
+                size: size,
+                hide: hide
             }, nextSizeContext);
         }
     };

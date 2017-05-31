@@ -183,6 +183,15 @@ define(function (require, exports, module) {
     document.documentElement.classList.add('famous-root');
   }
 
+  var canvas;
+  Engine.getCachedCanvas = function() {
+    if(!canvas){
+      canvas = document.createElement('canvas');
+      document.createDocumentFragment().appendChild(canvas);
+    }
+    return canvas;
+  };
+
   /**
    * Add event handler object to set of downstream handlers.
    *

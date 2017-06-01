@@ -100,10 +100,7 @@ define(function (require, exports, module) {
   ContainerSurface.prototype.commit = function commit(context) {
     var previousSize = this._size ? [this._size[0], this._size[1]] : null;
     var result = Surface.prototype.commit.apply(this, arguments);
-    if (this._shouldRecalculateSize || (previousSize && (this._size[0] !== previousSize[0] || this._size[1] !== previousSize[1]))) {
-      this.context.setSize();
-      this._shouldRecalculateSize = false;
-    }
+    this.context.setSize(context.size);
     this.context.update({hide: context.opacity === 0 || context.hide});
     return result;
   };

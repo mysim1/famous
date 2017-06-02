@@ -62,6 +62,7 @@ define(function (require, exports, module) {
    * @private
    * @method allocate
    *
+   * @param {Object} options
    * @param {String} options.type type of element, e.g. 'div'
    * @param {Boolean} options.insertFirst Whether it should be allocated from the top instead of the bottom
    * or at the end. Defaults to false (at the bottom).
@@ -74,19 +75,18 @@ define(function (require, exports, module) {
     var isNested = !!options.isNested;
     type = type.toLowerCase();
     var detachedList = isNested ? this.detachedAllocators : this.detachedHtmlElements;
-    var result;
     if (!(type in detachedList)) detachedList[type] = [];
     var nodeStore = detachedList[type];
     var result;
-    /*if (nodeStore.length > 0 && !insertFirst) {
+    if (nodeStore.length > 0 && !insertFirst) {
       result = nodeStore.pop();
     }
-    else {*/
+    else {
       result = this._allocateNewHtmlOutput(type, insertFirst);
       if (isNested) {
         result = this._allocateNewAllocator(result);
       }
-    // }
+    }
     return result;
   };
 

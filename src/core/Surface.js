@@ -498,7 +498,6 @@ define(function(require, exports, module) {
           DOMBuffer.removeChild(target, children[i]);
         }
         DOMBuffer.appendChild(target, content);
-        // this.content = target.innerHTML;
       } else {
         /* textContent proved to be faster than innerHTML: https://jsperf.com/innerhtml-vs-textcontent-with-checks/1 */
         if(content.includes('<')){
@@ -506,7 +505,6 @@ define(function(require, exports, module) {
         } else {
           DOMBuffer.assignProperty(target, 'textContent', content);
         }
-        // this.content = content;
       }
 
     };

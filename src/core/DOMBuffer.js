@@ -5,15 +5,16 @@
 
 define(function (require, exports, module) {
 
+  /**
+   * Singleton class optimized for high performance in DOM updates. All DOM updates that are done through this class will
+   * be cached and can be flushed at the same order the instructions came in.
+   *
+   * TODO: Further optimization here could be to introduce a createElement function that returns a placeholder that is
+   * recognized by the other functions and then we can create all elements at the end of the frame too
+   *
+   * @type {{}}
+   */
   var DOMBuffer = {};
-  /*var enqueuedAttributes = [];
-  var enqueuedProperties = [];
-  var enqueuedAdditions = [];
-  var enqueuedRemovals = [];
-  var enqueuedAttributeRemovals = [];
-  var enqueuedChildRemovals = [];
-  var enqueuedChildAppendices = [];
-  var enqueuedInsertBefore = [];*/
   var enqueuedOperations = [];
 
 

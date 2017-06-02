@@ -12,6 +12,7 @@ define(function(require, exports, module) {
     var EventHandler = require('./EventHandler');
     var Transform = require('./Transform');
     var DOMEventHandler = require('./DOMEventHandler');
+    var DOMBuffer = require('./DOMBuffer');
 
     var usePrefix = !('transform' in document.documentElement.style);
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -191,12 +192,12 @@ define(function(require, exports, module) {
     var _setMatrix;
     if (usePrefix) {
         _setMatrix = function(element, matrix) {
-            element.style.webkitTransform = _formatCSSTransform(matrix);
+          DOMBuffer.assignProperty(element.style, 'webkitTransform', _formatCSSTransform(matrix));
         };
     }
     else {
         _setMatrix = function(element, matrix) {
-            element.style.transform = _formatCSSTransform(matrix);
+          DOMBuffer.assignProperty(element.style, 'transform', _formatCSSTransform(matrix));
         };
     }
 
@@ -215,11 +216,11 @@ define(function(require, exports, module) {
 
     // Shrink given document element until it is effectively invisible.
     var _setInvisible = usePrefix ? function(element) {
-        element.style.webkitTransform = 'scale3d(0.0001,0.0001,0.0001)';
-        element.style.opacity = 0;
+      DOMBuffer.assignProperty(element.style, 'webkitTransform', 'scale3d(0.0001,0.0001,0.0001)');
+      DOMBuffer.assignProperty(element.style, 'opacity', '0');
     } : function(element) {
-        element.style.transform = 'scale3d(0.0001,0.0001,0.0001)';
-        element.style.opacity = 0;
+      DOMBuffer.assignProperty(element.style, 'transform', 'scale3d(0.0001,0.0001,0.0001)');
+      DOMBuffer.assignProperty(element.style, 'opacity', '0');
     };
 
     function _xyNotEquals(a, b) {
@@ -256,12 +257,12 @@ define(function(require, exports, module) {
 
         if (this._invisible) {
             this._invisible = false;
-            this._element.style.display = '';
+            DOMBuffer.assignProperty(this._element.style, 'display', '');
         }
 
         if (this._opacity !== opacity) {
             this._opacity = opacity;
-            target.style.opacity = (opacity >= 1) ? '0.999999' : opacity;
+            DOMBuffer.assignProperty(target.style, 'opacity', (opacity >= 1) ? '0.999999' : opacity);
         }
 
         if (this._transformDirty || this._originDirty || this._sizeDirty) {
@@ -289,7 +290,7 @@ define(function(require, exports, module) {
     ElementOutput.prototype.cleanup = function cleanup() {
         if (this._element) {
             this._invisible = true;
-            this._element.style.display = 'none';
+            DOMBuffer.assignProperty(this._element.style, 'display', 'none');
         }
     };
 
@@ -334,7 +335,7 @@ define(function(require, exports, module) {
             _removeEventListeners.call(this, target);
             if (this._invisible) {
                 this._invisible = false;
-                this._element.style.display = '';
+                DOMBuffer.assignProperty(this._element.style, 'display', '');
             }
         }
         this._element = null;

@@ -9,6 +9,7 @@
 
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
+    var DOMBuffer = require('../core/DOMBuffer');
 
     /**
      * A Famo.us surface in the form of an HTML input element.
@@ -151,10 +152,11 @@ define(function(require, exports, module) {
      * @param {Node} target document parent of this container
      */
     InputSurface.prototype.deploy = function deploy(target) {
-        if (this._placeholder !== '') target.placeholder = this._placeholder;
-        target.value = this._value;
-        target.type = this._type;
-        target.name = this._name;
+        if (this._placeholder !== '')
+          DOMBuffer.assignProperty(target, 'placeholder', this._placeholder);
+        DOMBuffer.assignProperty(target, 'value', this._value);
+        DOMBuffer.assignProperty(target, 'type', this._type);
+        DOMBuffer.assignProperty(target, 'name', this._name);
     };
 
     module.exports = InputSurface;

@@ -9,6 +9,7 @@
 
 define(function(require, exports, module) {
     var ElementOutput = require('./ElementOutput');
+    var DOMBuffer = require('./DOMBuffer');
 
     /**
      * A base class for viewable content and event
@@ -254,7 +255,7 @@ define(function(require, exports, module) {
 
     //  Apply to document all changes from removeClass() since last setup().
     function _cleanupClasses(target) {
-        for (var i = 0; i < this._dirtyClasses.length; i++) target.classList.remove(this._dirtyClasses[i]);
+        for (var i = 0; i < this._dirtyClasses.length; i++) DOMBuffer.removeFromObject(target.classList, this._dirtyClasses[i]);
         this._dirtyClasses = [];
     }
 
@@ -262,7 +263,7 @@ define(function(require, exports, module) {
     //  These will be deployed to the document on call to #setup().
     function _applyStyles(target) {
         for (var n in this.properties) {
-            target.style[n] = this.properties[n];
+            DOMBuffer.assignProperty(target.style, n, this.properties[n]);
         }
     }
 
@@ -270,7 +271,7 @@ define(function(require, exports, module) {
     // These will be deployed to the document on call to #setup().
     function _cleanupStyles(target) {
         for (var n in this.properties) {
-            target.style[n] = '';
+            DOMBuffer.assignProperty(target.style, n, '');
         }
     }
 
@@ -278,11 +279,11 @@ define(function(require, exports, module) {
     //  These will be deployed to the document on call to #setup().
     function _applyAttributes(target) {
         for (var n in this.attributes) {
-            target.setAttribute(n, this.attributes[n]);
+            DOMBuffer.setAttribute(target, n, this.attributes[n]);
         }
         for (var index in this._dirtyAttributes) {
             var name = this._dirtyAttributes[index];
-            target.removeAttribute(name);
+            DOMBuffer.removeAttribute(target, name);
             this._dirtyAttributes.shift();
         }
     }
@@ -291,7 +292,7 @@ define(function(require, exports, module) {
     // These will be deployed to the document on call to #setup().
     function _cleanupAttributes(target) {
         for (var n in this.attributes) {
-            target.removeAttribute(n);
+            DOMBuffer.removeAttribute(target, n);
         }
     }
 
@@ -312,14 +313,14 @@ define(function(require, exports, module) {
         if (this.elementClass) {
             if (this.elementClass instanceof Array) {
                 for (var i = 0; i < this.elementClass.length; i++) {
-                    target.classList.add(this.elementClass[i]);
+                    DOMBuffer.addToObject(target.classList, this.elementClass[i]);
                 }
             }
             else {
-                target.classList.add(this.elementClass);
+              DOMBuffer.addToObject(target.classList, this.elementClass);
             }
         }
-        target.style.display = '';
+        DOMBuffer.assignProperty(target.style, 'display', '');
         this.attach(target);
         this._opacity = null;
         this._currentTarget = target;
@@ -357,7 +358,7 @@ define(function(require, exports, module) {
         if (this._classesDirty) {
             _cleanupClasses.call(this, target);
             var classList = this.getClassList();
-            for (var i = 0; i < classList.length; i++) target.classList.add(classList[i]);
+            for (var i = 0; i < classList.length; i++) DOMBuffer.addToObject(target.classList, classList[i]);
             this._classesDirty = false;
             this._trueSizeCheck = true;
         }
@@ -418,8 +419,10 @@ define(function(require, exports, module) {
 
         if (this._sizeDirty) {
             if (this._size) {
-              target.style.width = this.size && this.size[0] === true  || this._size[0] === true ? '' : this._size[0] + 'px';
-              target.style.height = this.size && this.size[1] === true || this._size[1] === true ? '' : this._size[1] + 'px';
+              var resolvedWidth = this.size && this.size[0] === true  || this._size[0] === true ? '' : this._size[0] + 'px';
+              var resolvedHeight = this.size && this.size[1] === true || this._size[1] === true ? '' : this._size[1] + 'px';
+              DOMBuffer.assignProperty(target.style, 'width', resolvedWidth);
+              DOMBuffer.assignProperty(target.style, 'height', resolvedHeight);
             }
 
             this._eventOutput.emit('resize');
@@ -455,10 +458,10 @@ define(function(require, exports, module) {
         var target = this._currentTarget;
         this._eventOutput.emit('recall');
         this.recall(target);
-        target.style.display = 'none';
-        target.style.opacity = '';
-        target.style.width = '';
-        target.style.height = '';
+        DOMBuffer.assignProperty(target.style, 'display', 'none');
+        DOMBuffer.assignProperty(target.style, 'opacity', '');
+        DOMBuffer.assignProperty(target.style, 'width', '');
+        DOMBuffer.assignProperty(target.style, 'height', '');
         _cleanupStyles.call(this, target);
         _cleanupAttributes.call(this, target);
         var classList = this.getClassList();
@@ -467,11 +470,11 @@ define(function(require, exports, module) {
         if (this.elementClass) {
             if (this.elementClass instanceof Array) {
                 for (i = 0; i < this.elementClass.length; i++) {
-                    target.classList.remove(this.elementClass[i]);
+                  DOMBuffer.removeFromObject(target.classList, this.elementClass[i]);
                 }
             }
             else {
-                target.classList.remove(this.elementClass);
+              DOMBuffer.removeFromObject(target.classList, this.elementClass);
             }
         }
         this.detach(target);
@@ -489,18 +492,23 @@ define(function(require, exports, module) {
     Surface.prototype.deploy = function deploy(target) {
       var content = this.getContent();
       if (content instanceof Node) {
-        while (target.hasChildNodes())
-          target.removeChild(target.firstChild);
-        target.appendChild(content);
-      } else {
-        /* textContent proved to be faster: https://jsperf.com/innerhtml-vs-textcontent-with-checks/1 */
-        if(content.includes('<')){
-          target.innerHTML = content;
-        } else {
-          target.textContent = content;
+        var children = target.childNodes || [];
+        //TODO Confirm that this works
+        for(var i = 0;i< children.length; i++){
+          DOMBuffer.removeChild(target, children[i]);
         }
+        DOMBuffer.appendChild(target, content);
+        // this.content = target.innerHTML;
+      } else {
+        /* textContent proved to be faster than innerHTML: https://jsperf.com/innerhtml-vs-textcontent-with-checks/1 */
+        if(content.includes('<')){
+          DOMBuffer.assignProperty(target, 'innerHTML', content);
+        } else {
+          DOMBuffer.assignProperty(target, 'textContent', content);
+        }
+        // this.content = content;
       }
-      this.content = target.innerHTML;
+
     };
 
 
@@ -512,16 +520,14 @@ define(function(require, exports, module) {
        * the next render-cycle.
        */
       Surface.prototype.recall = function recall(target) {
-        if (!this._contentDirty) {
           var df = document.createDocumentFragment();
-          while (target.hasChildNodes()) {
-            df.appendChild(target.firstChild);
+          var children = target.childNodes || [];
+          //TODO Confirm that this works
+          for(var i = 0;i< children.length; i++){
+            DOMBuffer.appendChild(df, children[i]);
           }
-          this.setContent(df);
-        }
-        else {
           this._contentDirty = true;
-        }
+
       };
 
     /**

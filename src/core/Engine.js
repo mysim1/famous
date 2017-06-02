@@ -28,6 +28,8 @@ define(function (require, exports, module) {
   var ElementAllocator = require('./ElementAllocator');
   var EventHandler = require('./EventHandler');
   var OptionsManager = require('./OptionsManager');
+  var DOMBuffer = require('./DOMBuffer');
+
 
   var Engine = {};
 
@@ -98,6 +100,8 @@ define(function (require, exports, module) {
     }
 
     for (i = 0; i < contexts.length; i++) contexts[i].update();
+
+    DOMBuffer.flushUpdates();
 
     eventHandler.emit('postrender');
   };

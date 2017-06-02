@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     var Entity = require('./Entity');
     var EventHandler = require('./EventHandler');
     var Transform = require('./Transform');
+    var DOMEventHandler = require('./DOMEventHandler');
 
     var usePrefix = !('transform' in document.documentElement.style);
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -60,12 +61,12 @@ define(function(require, exports, module) {
      * @return {EventHandler} this
      */
     ElementOutput.prototype.on = function on(type, fn) {
-        if (this._element) this._element.addEventListener(type, this.eventForwarder);
+        if (this._element) DOMEventHandler.addEventListener(this.id, this._element, type, this.eventForwarder);
         this._eventOutput.on(type, fn);
     };
 
   ElementOutput.prototype.once = function on(type, fn) {
-      if (this._element) this._element.addEventListener(type, this.eventForwarder);
+      if (this._element) DOMEventHandler.addEventListener(this.id, this._element, type, this.eventForwarder);
       this._eventOutput.once(type, fn);
     };
 
@@ -142,7 +143,7 @@ define(function(require, exports, module) {
     //    Calling this enables methods like #on and #pipe.
     function _addEventListeners(target) {
         for (var i in this._eventOutput.listeners) {
-            target.addEventListener(i, this.eventForwarder);
+            DOMEventHandler.addEventListener(this.id, target, i, this.eventForwarder);
         }
     }
 
@@ -150,7 +151,7 @@ define(function(require, exports, module) {
     //  document element.  This occurs just before detach from the document.
     function _removeEventListeners(target) {
         for (var i in this._eventOutput.listeners) {
-            target.removeEventListener(i, this.eventForwarder);
+            DOMEventHandler.removeEventListener(this.id, i, this.eventForwarder)
         }
     }
 

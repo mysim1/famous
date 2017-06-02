@@ -16,7 +16,6 @@ define(function (require, exports, module) {
 
   var DOMEventHandler = {};
   var EventEmitter = require('./EventEmitter.js');
-  var DOMBuffer = require('./DOMBuffer');
 
   //TODO Add more to complete list
   var singleElementEvents = [
@@ -37,7 +36,7 @@ define(function (require, exports, module) {
     if(singleElementEvents.includes(type)){
       return element.addEventListener(type, this.eventForwarder);
     }
-    DOMBuffer.setAttribute(element, 'data-arvaid', id);
+    element.setAttribute('data-arvaid', id);
     var eventEmitter = initializedListeners[type];
     if(!eventEmitter){
       eventEmitter = initializedListeners[type] = new EventEmitter();

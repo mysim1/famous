@@ -205,13 +205,7 @@ define(function(require, exports, module) {
         return (100 * origin[0]) + '% ' + (100 * origin[1]) + '%';
     }
 
-    // Directly apply given origin coordinates to the document element as the
-    // appropriate webkit CSS style.
-    var _setOrigin = usePrefix ? function(element, origin) {
-        element.style.webkitTransformOrigin = _formatCSSOrigin(origin);
-    } : function(element, origin) {
-        element.style.transformOrigin = _formatCSSOrigin(origin);
-    };
+
 
     // Shrink given document element until it is effectively invisible.
     var _setInvisible = usePrefix ? function(element) {
@@ -274,7 +268,6 @@ define(function(require, exports, module) {
                     this._origin[1] = origin[1];
                 }
                 else this._origin = null;
-                _setOrigin(target, this._origin);
                 this._originDirty = false;
             }
 

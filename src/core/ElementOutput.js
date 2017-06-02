@@ -295,22 +295,6 @@ define(function(require, exports, module) {
      */
     ElementOutput.prototype.attach = function attach(target) {
         this._element = target;
-
-      // create an observer instance
-      var observer = new MutationObserver((mutations) =>{
-        if(window.observeAll){
-          debugger;
-        }
-
-      });
-
-    // configuration of the observer:
-      var config = { attributes: true, childList: true, characterData: true, attributeOldValue: true };
-
-      // pass in the target node, as well as the observer options
-      observer.observe(target, config);
-
-
       _addEventListeners.call(this, target);
     };
 

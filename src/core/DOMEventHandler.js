@@ -38,7 +38,6 @@ define(function (require, exports, module) {
       return element.addEventListener(type, this.eventForwarder);
     }
     DOMBuffer.setAttribute(element, 'data-arvaid', id);
-    element.setAttribute('data-arvaid', id);
     var eventEmitter = initializedListeners[type];
     if(!eventEmitter){
       eventEmitter = initializedListeners[type] = new EventEmitter();

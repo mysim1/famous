@@ -282,6 +282,9 @@ define(function(require, exports, module) {
             this._matrix = matrix;
             var aaMatrix = this._size ? Transform.thenMove(matrix, [-this._size[0]*origin[0], -this._size[1]*origin[1], 0]) : matrix;
             _setMatrix(target, aaMatrix);
+           /* Since a lot of browsers are buggy, they need the z-index to be set as well in order to successfully place things
+            * on top of each other*/
+            target.style.zIndex = aaMatrix[14];
             this._transformDirty = false;
         }
     };

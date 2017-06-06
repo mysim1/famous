@@ -206,7 +206,13 @@ define(function(require, exports, module) {
         return (100 * origin[0]) + '% ' + (100 * origin[1]) + '%';
     }
 
-
+    // Directly apply given origin coordinates to the document element as the
+    // appropriate webkit CSS style.
+    var _setOrigin = usePrefix ? function(element, origin) {
+        DOMBuffer.assignProperty(element.style, 'webkitTransform', _formatCSSOrigin(origin));
+    } : function(element, origin) {
+        DOMBuffer.assignProperty(element.style, 'transformOrigin', _formatCSSOrigin(origin));
+    };
 
     // Shrink given document element until it is effectively invisible.
     var _setInvisible = usePrefix ? function(element) {
@@ -269,6 +275,7 @@ define(function(require, exports, module) {
                     this._origin[1] = origin[1];
                 }
                 else this._origin = null;
+                _setOrigin(target, this._origin);
                 this._originDirty = false;
             }
 
@@ -276,6 +283,9 @@ define(function(require, exports, module) {
             this._matrix = matrix;
             var aaMatrix = this._size ? Transform.thenMove(matrix, [-this._size[0]*origin[0], -this._size[1]*origin[1], 0]) : matrix;
             _setMatrix(target, aaMatrix);
+             /* Since a lot of browsers are buggy, they need the z-index to be set as well besides the 3d transformation
+              * matrix to successfully place things on top of each other*/
+            DOMBuffer.assignProperty(target.style, 'zIndex', aaMatrix[14]);
             this._transformDirty = false;
         }
     };

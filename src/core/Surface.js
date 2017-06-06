@@ -493,8 +493,9 @@ define(function(require, exports, module) {
           target.removeChild(target.firstChild);
         target.appendChild(content);
       } else {
-        /* textContent proved to be faster: https://jsperf.com/innerhtml-vs-textcontent-with-checks/1 */
-        if(content.includes('<')){
+
+        /* textContent proved to be faster than innerHTML: https://jsperf.com/innerhtml-vs-textcontent-with-checks/1 */
+        if(content && content.includes && content.includes('<')){
           target.innerHTML = content;
         } else {
           target.textContent = content;

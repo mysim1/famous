@@ -69,16 +69,28 @@ define(function(require, exports, module) {
    * Listens once
    * @param type
    * @param handler
-   * @returns {Promise}
+   * @returns {Mocked Promise}
    */
   EventEmitter.prototype.once = function once(type, handler) {
-    return new Promise((resolve) => {
-      this.on(type, function onceWrapper() {
-        this.removeListener(type, onceWrapper);
-        handler && handler.apply(this._owner, arguments);
-        resolve.apply(null, arguments)
-      }, this);
-    });
+    var resolvers = [], resolveValue, isResolved = false;
+    var promise = {then: function(resolveFunction){
+      if(isResolved){
+        resolveFunction(resolveValue)
+      } else {
+        resolvers.push(resolveFunction);
+      }
+    }};
+    this.on(type, function onceWrapper() {
+      this.removeListener(type, onceWrapper);
+      handler && handler.apply(this._owner, arguments);
+      resolveValue = arguments[0];
+      isResolved = true;
+      for(var i=0; i<resolvers.length; i++){
+        resolvers[i](resolveValue);
+      }
+    }, this);
+
+    return promise;
   };
 
   /**

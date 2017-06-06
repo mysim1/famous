@@ -65,7 +65,9 @@ define(function (require, exports, module) {
           data[0].setAttribute(data[1], data[2]);
           break;
         case 'removeChild':
-          data[0].removeChild(data[1]);
+          if(data[0].childNodes.length && data[0].contains(data[1])){
+            data[0].removeChild(data[1]);
+          }
           break;
         case 'removeAttribute':
           data[0].removeAttribute(data[1]);

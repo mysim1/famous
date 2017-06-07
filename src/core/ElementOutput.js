@@ -285,7 +285,7 @@ define(function(require, exports, module) {
             _setMatrix(target, aaMatrix);
              /* Since a lot of browsers are buggy, they need the z-index to be set as well besides the 3d transformation
               * matrix to successfully place things on top of each other*/
-            DOMBuffer.assignProperty(target.style, 'zIndex', aaMatrix[14]);
+            DOMBuffer.assignProperty(target.style, 'zIndex', Math.round(aaMatrix[14]));
             this._transformDirty = false;
         }
     };

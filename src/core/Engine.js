@@ -153,13 +153,20 @@ define(function (require, exports, module) {
     handleResize();
   }
 
-  Engine.touchMoveEnabled = false;
+  Engine.touchMoveEnabled = true;
 
-  Engine.enableTouchMove = function enableTouchMove() {
-    if (!this.touchMoveEnabled) {
-      console.log("Warning: Touch move enabled. Outcomes might be unwated");
+  Engine.disableTouchMove = function disableTouchMove() {
+    if (this.touchMoveEnabled) {
+      // prevent scrolling via browser
+      window.addEventListener('touchmove', function (event) {
+        if (event.target.tagName === 'TEXTAREA' || this.touchMoveEnabled) {
+          return true;
+        } else {
+          event.preventDefault();
+        }
+      }.bind(this), { capture: true, passive: false });
+      this.touchMoveEnabled = false;
     }
-    this.touchMoveEnabled = true;
   };
 
 

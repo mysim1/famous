@@ -30,6 +30,15 @@ define(function (require, exports, module) {
   var OptionsManager = require('./OptionsManager');
   var DOMBuffer = require('./DOMBuffer');
 
+  /* Precise function for comparing time stamps*/
+  var getTime = (typeof window !== 'undefined' && window.performance && window.performance.now) ?
+    function() {
+      return window.performance.now();
+    }
+    : function() {
+      return Date.now();
+    };
+
 
   var Engine = {};
 
@@ -42,7 +51,9 @@ define(function (require, exports, module) {
 
   var deferQueue = [];
 
-  var lastTime = Date.now();
+  /* The last timestamp of the previous frame */
+  var lastTime = getTime();
+
   var frameTime;
   var frameTimeLimit;
   var loopEnabled = true;
@@ -77,7 +88,7 @@ define(function (require, exports, module) {
     currentFrame++;
     nextTickFrame = currentFrame;
 
-    var currentTime = Date.now();
+    var currentTime = getTime();
 
     this._lastFrameTimeDelta = currentTime - lastTime;
     // skip frame if we're over our framerate cap
@@ -95,7 +106,7 @@ define(function (require, exports, module) {
     while (numFunctions--) (nextTickQueue.shift())(currentFrame);
 
     // limit total execution time for deferrable functions
-    while (deferQueue.length && (Date.now() - currentTime) < MAX_DEFER_FRAME_TIME) {
+    while (deferQueue.length && (getTime() - currentTime) < MAX_DEFER_FRAME_TIME) {
       deferQueue.shift().call(this);
     }
 
@@ -145,13 +156,20 @@ define(function (require, exports, module) {
     handleResize();
   }
 
-  Engine.touchMoveEnabled = false;
+  Engine.touchMoveEnabled = true;
 
-  Engine.enableTouchMove = function enableTouchMove() {
-    if (!this.touchMoveEnabled) {
-      console.log("Warning: Touch move enabled. Outcomes might be unwated");
+  Engine.disableTouchMove = function disableTouchMove() {
+    if (this.touchMoveEnabled) {
+      // prevent scrolling via browser
+      window.addEventListener('touchmove', function (event) {
+        if (event.target.tagName === 'TEXTAREA' || this.touchMoveEnabled) {
+          return true;
+        } else {
+          event.preventDefault();
+        }
+      }.bind(this), { capture: true, passive: false });
+      this.touchMoveEnabled = false;
     }
-    this.touchMoveEnabled = true;
   };
 
 
@@ -425,6 +443,8 @@ define(function (require, exports, module) {
   Engine.nextTick = function nextTick(fn) {
     nextTickQueue.push(fn);
   };
+
+  Engine.now = getTime;
 
   /**
    * Queue a function to be executed sometime soon, at a time that is

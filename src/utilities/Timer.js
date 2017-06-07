@@ -23,13 +23,7 @@ define(function(require, exports, module) {
 
     var _event  = 'prerender';
 
-    var getTime = (typeof window !== 'undefined' && window.performance && window.performance.now) ?
-        function() {
-            return window.performance.now();
-        }
-        : function() {
-            return Date.now();
-        };
+
 
     /**
      * Add a function to be run on every prerender
@@ -58,9 +52,9 @@ define(function(require, exports, module) {
      * @return {function} function passed in as parameter
      */
     function setTimeout(fn, duration) {
-        var t = getTime();
+        var t = FamousEngine.now();
         var callback = function() {
-            var t2 = getTime();
+            var t2 = FamousEngine.now();
             if (t2 - t >= duration) {
                 fn.apply(this, arguments);
                 FamousEngine.removeListener(_event, callback);
@@ -82,12 +76,12 @@ define(function(require, exports, module) {
      * @return {function} function passed in as parameter
      */
     function setInterval(fn, duration) {
-        var t = getTime();
+        var t = FamousEngine.now();
         var callback = function() {
-            var t2 = getTime();
+            var t2 = FamousEngine.now();
             if (t2 - t >= duration) {
                 fn.apply(this, arguments);
-                t = getTime();
+                t = FamousEngine.now();
             }
         };
         return addTimerFunction(callback);
@@ -171,10 +165,10 @@ define(function(require, exports, module) {
         return function() {
             ctx = this;
             args = arguments;
-            timestamp = getTime();
+            timestamp = FamousEngine.now();
 
             var fn = function() {
-                var last = getTime - timestamp;
+                var last = FamousEngine.now() - timestamp;
 
                 if (last < wait) {
                     timeout = setTimeout(fn, wait - last);

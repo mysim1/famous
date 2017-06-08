@@ -26,7 +26,10 @@ define(function (require, exports, module) {
   var initializedListeners = {};
 
   DOMEventHandler.isNativeEvent = function(eventName) {
-    return typeof document.body["on" + eventName] !== "undefined";
+    return typeof document.body["on" + eventName] !== "undefined"
+      ||
+        /* Needed because otherwise not able to use mobile emulation in browser! */
+      ['touchmove', 'touchstart', 'touchend'].includes(eventName);
   };
 
   DOMEventHandler.addEventListener = function(id, element, type, callback){

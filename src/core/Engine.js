@@ -72,6 +72,13 @@ define(function (require, exports, module) {
   /** @const */
   var MAX_DEFER_FRAME_TIME = 10;
 
+
+  Engine.PriorityLevels = {
+    critical: Infinity,
+    normal: 130,
+    generous: 0
+  };
+
   /**
    * Inside requestAnimationFrame loop, step() is called, which:
    *   calculates current FPS (throttling loop if it is over limit set in setFPSCap),
@@ -94,7 +101,15 @@ define(function (require, exports, module) {
     // skip frame if we're over our framerate cap
     if (frameTimeLimit && this._lastFrameTimeDelta < frameTimeLimit) return;
 
-    var i = 0;
+    this._priorityLevel = Infinity;
+    var priorityLevels = Object.keys(Engine.PriorityLevels);
+    for (var i = 0; i < priorityLevels.length; i++) {
+      var priority = priorityLevels[i];
+      var priorityLevelCriteria = Engine.PriorityLevels[priority];
+      if (this._lastFrameTimeDelta < priorityLevelCriteria && priorityLevelCriteria <= this._priorityLevel){
+          this._priorityLevel = priorityLevelCriteria;
+        }
+    }
 
     frameTime = currentTime - lastTime;
     lastTime = currentTime;
@@ -110,12 +125,42 @@ define(function (require, exports, module) {
       deferQueue.shift().call(this);
     }
 
-    for (i = 0; i < contexts.length; i++) contexts[i].update();
+    for (var i = 0; i < contexts.length; i++) contexts[i].update();
 
     DOMBuffer.flushUpdates();
 
     eventHandler.emit('postrender');
+
+
   };
+
+  /**
+   * @example
+   *
+   * Engine.restrictAnimations({
+   *  size: Engine.PriorityLevel.critical,
+   *  opacity: Engine.PriorityLevel.critical
+   * })
+   *
+   * Instructs the engine to disable the animations for the different properties passed.
+   *
+   * @param options
+   */
+  Engine.restrictAnimations = function disableAnimationsWhen(options) {
+    this._disableAnimationSpec = options;
+  };
+
+  Engine.shouldPropertyAnimate = function shouldPropertyAnimate(propertyName){
+    if(!this._disableAnimationSpec){
+      return true;
+    }
+    var priorityLevel = this._disableAnimationSpec[propertyName];
+    if(priorityLevel === undefined){
+      return true;
+    }
+    return this._priorityLevel < priorityLevel;
+  };
+
 
   Engine.getFrameTimeDelta = function getFrameTimeDelta() {
     return this._lastFrameTimeDelta;
@@ -158,6 +203,9 @@ define(function (require, exports, module) {
 
   Engine.touchMoveEnabled = true;
 
+  Engine.getPriorityLevel = function () {
+    return this._priorityLevel;
+  };
   Engine.disableTouchMove = function disableTouchMove() {
     if (this.touchMoveEnabled) {
       // prevent scrolling via browser
@@ -181,6 +229,7 @@ define(function (require, exports, module) {
    * @method initialize
    */
   function initialize() {
+
     // prevent scrolling via browser
     window.addEventListener('touchmove', function (event) {
       if (event.target.tagName === 'TEXTAREA' || this.touchMoveEnabled) {
@@ -364,6 +413,9 @@ define(function (require, exports, module) {
    * @return {Context} new Context within el
    */
   Engine.createContext = function createContext(el) {
+
+    this._priorityLevel = Engine.PriorityLevels.critical;
+
     if (!initialized && options.appMode) Engine.nextTick(initialize.bind(this));
 
     var needMountContainer = false;

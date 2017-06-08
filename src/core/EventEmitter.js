@@ -41,7 +41,6 @@ define(function(require, exports, module) {
     }
     var handlers = this.listeners[type];
     if (handlers) {
-      handlers = Array.from(handlers);
       for (var i = 0; i < handlers.length; i++) {
         handlers[i].apply(this._owner, args);
       }

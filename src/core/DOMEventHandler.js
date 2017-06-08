@@ -20,7 +20,7 @@ define(function (require, exports, module) {
 
   //TODO Add more to complete list
   var singleElementEvents = [
-    'submit', 'focus', 'blur', 'load', 'unload', 'change', 'reset', 'scroll', 'mousewheel', 'wheel'
+    'submit', 'focus', 'blur', 'load', 'unload', 'change', 'reset', 'scroll'
   ];
 
   var initializedListeners = {};

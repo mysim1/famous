@@ -20,7 +20,7 @@ define(function (require, exports, module) {
 
   //TODO Add more to complete list
   var singleElementEvents = [
-    'submit', 'focus', 'blur', 'load', 'unload', 'change', 'reset', 'scroll'
+    'submit', 'focus', 'blur', 'load', 'unload', 'change', 'reset', 'scroll', 'mousewheel', 'wheel'
   ];
 
   var initializedListeners = {};
@@ -35,7 +35,7 @@ define(function (require, exports, module) {
     }
 
     if(singleElementEvents.includes(type)){
-      return element.addEventListener(type, this.eventForwarder);
+      return element.addEventListener(type, callback);
     }
     DOMBuffer.setAttribute(element, 'data-arvaid', id);
     var eventEmitter = initializedListeners[type];
@@ -52,7 +52,10 @@ define(function (require, exports, module) {
 
   };
 
-  DOMEventHandler.removeEventListener = function(id, type, callback) {
+  DOMEventHandler.removeEventListener = function(element, id, type, callback) {
+    if(singleElementEvents.includes(type)){
+      return element.addEventListener(type, callback);
+    }
     if(initializedListeners[type]){
       initializedListeners[type].removeListener(id, callback);
     }

@@ -151,7 +151,7 @@ define(function(require, exports, module) {
     //  document element.  This occurs just before detach from the document.
     function _removeEventListeners(target) {
         for (var i in this._eventOutput.listeners) {
-            DOMEventHandler.removeEventListener(this.id, i, this.eventForwarder)
+            DOMEventHandler.removeEventListener(target, this.id, i, this.eventForwarder)
         }
     }
 

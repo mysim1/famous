@@ -504,6 +504,7 @@ define(function (require, exports, module) {
       /* textContent proved to be faster than innerHTML: https://jsperf.com/innerhtml-vs-textcontent-with-checks/1 */
       if (content && content.includes && content.includes('<')) {
         DOMBuffer.assignProperty(target, 'innerHTML', content);
+        DOMBuffer.setAttributeOnDescendants(target, 'data-arvaid', this.id);
       } else {
         DOMBuffer.assignProperty(target, 'textContent', content);
       }

@@ -29,6 +29,10 @@ define(function (require, exports, module) {
     enqueuedOperations.push({data: [object, value], operation: 'addToObject'});
   };
 
+  DOMBuffer.setAttributeOnDescendants = function (element, attribute, attributeValue) {
+    enqueuedOperations.push({data: [element, attribute, attributeValue], operation: 'setAttributeOnDescendants'});
+  };
+
   DOMBuffer.removeFromObject = function (object, attribute) {
     enqueuedOperations.push({data: [object, attribute], operation: 'removeFromObject'});
   };
@@ -80,6 +84,15 @@ define(function (require, exports, module) {
           break;
         case 'assignProperty':
           data[0][data[1]] = data[2];
+          break;
+        case 'setAttributeOnDescendants':
+          /* Gets all the descendants for element
+           * https://stackoverflow.com/questions/26325278/how-can-i-get-all-descendant-elements-for-parent-container
+           * */
+          var descendants = data[0].querySelectorAll("*");
+          for(var i=0; i < descendants.length; i++){
+            descendants[i].setAttribute(data[1], data[2]);
+          }
           break;
       }
     }

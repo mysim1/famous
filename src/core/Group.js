@@ -147,6 +147,7 @@ define(function (require, exports, module) {
       allocator: this._allocator,
       transform: Transform.translate(-origin[0] * size[0], -origin[1] * size[1], 0),
       origin: origin,
+      hide: context.opacity === 0 || context.hide,
       size: size
     });
     return result;

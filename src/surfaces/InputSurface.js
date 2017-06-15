@@ -151,13 +151,11 @@ define(function(require, exports, module) {
      * @method deploy
      * @param {Node} target document parent of this container
      */
-    InputSurface.prototype.deploy = function deploy(target) {
-        if (this._placeholder !== '')
-          DOMBuffer.assignProperty(target, 'placeholder', this._placeholder);
-        DOMBuffer.assignProperty(target, 'value', this._value);
-        DOMBuffer.assignProperty(target, 'type', this._type);
-        DOMBuffer.assignProperty(target, 'name', this._name);
-    };
-
     module.exports = InputSurface;
+  InputSurface.prototype.deploy = function deploy(target) {
+    DOMBuffer.assignProperty(target, 'placeholder', this._placeholder || '');
+    DOMBuffer.assignProperty(target, 'type', this._type);
+    DOMBuffer.assignProperty(target, 'value', this._value);
+    DOMBuffer.assignProperty(target, 'name', this._name);
+  };
 });

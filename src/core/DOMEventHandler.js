@@ -60,7 +60,7 @@ define(function (require, exports, module) {
 
   DOMEventHandler.removeEventListener = function(element, id, type, callback) {
     if(singleElementEvents.includes(type)){
-      return element.addEventListener(type, callback);
+      return element.removeEventListener(type, callback);
     }
     if(initializedListeners[type]){
       initializedListeners[type].removeListener(id, callback);

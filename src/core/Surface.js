@@ -251,6 +251,7 @@ define(function (require, exports, module) {
     if (options.properties) this.setProperties(options.properties);
     if (options.attributes) this.setAttributes(options.attributes);
     if (options.content) this.setContent(options.content);
+    this.options = options;
     return this;
   };
 
@@ -502,7 +503,7 @@ define(function (require, exports, module) {
       DOMBuffer.appendChild(target, content);
     } else {
       /* textContent proved to be faster than innerHTML: https://jsperf.com/innerhtml-vs-textcontent-with-checks/1 */
-      if (content && content.includes && content.includes('<')) {
+      if (!this.options.encodeHTML && content && content.includes && content.includes('<')) {
         DOMBuffer.assignProperty(target, 'innerHTML', content);
         DOMBuffer.setAttributeOnDescendants(target, 'data-arvaid', this.id);
       } else {

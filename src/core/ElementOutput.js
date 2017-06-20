@@ -11,6 +11,8 @@ define(function(require, exports, module) {
     var Entity = require('./Entity');
     var EventHandler = require('./EventHandler');
     var Transform = require('./Transform');
+    var DOMEventHandler = require('./DOMEventHandler');
+    var DOMBuffer = require('./DOMBuffer');
 
     var usePrefix = !('transform' in document.documentElement.style);
     var devicePixelRatio = window.devicePixelRatio || 1;
@@ -60,12 +62,12 @@ define(function(require, exports, module) {
      * @return {EventHandler} this
      */
     ElementOutput.prototype.on = function on(type, fn) {
-        if (this._element) this._element.addEventListener(type, this.eventForwarder);
+        if (this._element) DOMEventHandler.addEventListener(this.id, this._element, type, this.eventForwarder);
         this._eventOutput.on(type, fn);
     };
 
   ElementOutput.prototype.once = function on(type, fn) {
-      if (this._element) this._element.addEventListener(type, this.eventForwarder);
+      if (this._element) DOMEventHandler.addEventListener(this.id, this._element, type, this.eventForwarder);
       this._eventOutput.once(type, fn);
     };
 
@@ -142,7 +144,7 @@ define(function(require, exports, module) {
     //    Calling this enables methods like #on and #pipe.
     function _addEventListeners(target) {
         for (var i in this._eventOutput.listeners) {
-            target.addEventListener(i, this.eventForwarder);
+            DOMEventHandler.addEventListener(this.id, target, i, this.eventForwarder);
         }
     }
 
@@ -150,7 +152,7 @@ define(function(require, exports, module) {
     //  document element.  This occurs just before detach from the document.
     function _removeEventListeners(target) {
         for (var i in this._eventOutput.listeners) {
-            target.removeEventListener(i, this.eventForwarder);
+            DOMEventHandler.removeEventListener(target, this.id, i, this.eventForwarder)
         }
     }
 
@@ -175,7 +177,6 @@ define(function(require, exports, module) {
         result += m[15] + ')';
         return result;
     }
-
     /**
      * Directly apply given FamousMatrix to the document element as the
      *   appropriate webkit CSS style.
@@ -191,12 +192,12 @@ define(function(require, exports, module) {
     var _setMatrix;
     if (usePrefix) {
         _setMatrix = function(element, matrix) {
-            element.style.webkitTransform = _formatCSSTransform(matrix);
+          DOMBuffer.assignProperty(element.style, 'webkitTransform', _formatCSSTransform(matrix));
         };
     }
     else {
         _setMatrix = function(element, matrix) {
-            element.style.transform = _formatCSSTransform(matrix);
+          DOMBuffer.assignProperty(element.style, 'transform', _formatCSSTransform(matrix));
         };
     }
 
@@ -208,18 +209,18 @@ define(function(require, exports, module) {
     // Directly apply given origin coordinates to the document element as the
     // appropriate webkit CSS style.
     var _setOrigin = usePrefix ? function(element, origin) {
-        element.style.webkitTransformOrigin = _formatCSSOrigin(origin);
+        DOMBuffer.assignProperty(element.style, 'webkitTransform', _formatCSSOrigin(origin));
     } : function(element, origin) {
-        element.style.transformOrigin = _formatCSSOrigin(origin);
+        DOMBuffer.assignProperty(element.style, 'transformOrigin', _formatCSSOrigin(origin));
     };
 
     // Shrink given document element until it is effectively invisible.
     var _setInvisible = usePrefix ? function(element) {
-        element.style.webkitTransform = 'scale3d(0.0001,0.0001,0.0001)';
-        element.style.opacity = 0;
+      DOMBuffer.assignProperty(element.style, 'webkitTransform', 'scale3d(0.0001,0.0001,0.0001)');
+      DOMBuffer.assignProperty(element.style, 'opacity', '0');
     } : function(element) {
-        element.style.transform = 'scale3d(0.0001,0.0001,0.0001)';
-        element.style.opacity = 0;
+      DOMBuffer.assignProperty(element.style, 'transform', 'scale3d(0.0001,0.0001,0.0001)');
+      DOMBuffer.assignProperty(element.style, 'opacity', '0');
     };
 
     function _xyNotEquals(a, b) {
@@ -256,12 +257,12 @@ define(function(require, exports, module) {
 
         if (this._invisible) {
             this._invisible = false;
-            this._element.style.display = '';
+            DOMBuffer.assignProperty(this._element.style, 'display', '');
         }
 
         if (this._opacity !== opacity) {
             this._opacity = opacity;
-            target.style.opacity = (opacity >= 1) ? '0.999999' : opacity;
+            DOMBuffer.assignProperty(target.style, 'opacity', (opacity >= 1) ? '0.999999' : opacity);
         }
 
         if (this._transformDirty || this._originDirty || this._sizeDirty) {
@@ -282,6 +283,9 @@ define(function(require, exports, module) {
             this._matrix = matrix;
             var aaMatrix = this._size ? Transform.thenMove(matrix, [-this._size[0]*origin[0], -this._size[1]*origin[1], 0]) : matrix;
             _setMatrix(target, aaMatrix);
+             /* Since a lot of browsers are buggy, they need the z-index to be set as well besides the 3d transformation
+              * matrix to successfully place things on top of each other*/
+            DOMBuffer.assignProperty(target.style, 'zIndex', Math.round(aaMatrix[14]));
             this._transformDirty = false;
         }
     };
@@ -289,7 +293,7 @@ define(function(require, exports, module) {
     ElementOutput.prototype.cleanup = function cleanup() {
         if (this._element) {
             this._invisible = true;
-            this._element.style.display = 'none';
+            DOMBuffer.assignProperty(this._element.style, 'display', 'none');
         }
     };
 
@@ -302,7 +306,7 @@ define(function(require, exports, module) {
      */
     ElementOutput.prototype.attach = function attach(target) {
         this._element = target;
-        _addEventListeners.call(this, target);
+      _addEventListeners.call(this, target);
     };
 
     /**
@@ -318,7 +322,7 @@ define(function(require, exports, module) {
             _removeEventListeners.call(this, target);
             if (this._invisible) {
                 this._invisible = false;
-                this._element.style.display = '';
+                DOMBuffer.assignProperty(this._element.style, 'display', '');
             }
         }
         this._element = null;

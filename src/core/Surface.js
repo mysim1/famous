@@ -295,6 +295,7 @@ define(function (require, exports, module) {
     for (var n in this.attributes) {
       DOMBuffer.removeAttribute(target, n);
     }
+    DOMBuffer.removeAttribute(target, 'data-arvaid');
   }
 
   function _xyNotEquals(a, b) {

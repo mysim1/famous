@@ -10,6 +10,7 @@
 
 define(function(require, exports, module) {
     var Surface = require('../core/Surface');
+    var DOMBuffer = require('famous/core/DOMBuffer');
 
     /**
      * A surface containing image content.
@@ -24,6 +25,11 @@ define(function(require, exports, module) {
     function ImageSurface(options) {
         this._imageUrl = undefined;
         Surface.apply(this, arguments);
+        this.on('load', (function() {
+          if(this.size && (this.size[0] === true || this.size[1] === true)){
+            this._eventOutput.emit('resize');
+          }
+        }).bind(this));
     }
 
     var urlCache = [];
@@ -86,6 +92,7 @@ define(function(require, exports, module) {
 
         this._imageUrl = imageUrl;
         this._contentDirty = true;
+
     };
 
     /**
@@ -102,8 +109,7 @@ define(function(require, exports, module) {
             img.src = this._imageUrl || '';
             nodeCache[urlIndex] = img;
         }
-
-        target.src = this._imageUrl || '';
+        DOMBuffer.assignProperty(target, 'src', this._imageUrl || '');
     };
 
     /**
@@ -115,7 +121,7 @@ define(function(require, exports, module) {
      * @param {Node} target node to which the component was deployed
      */
     ImageSurface.prototype.recall = function recall(target) {
-        target.src = '';
+      DOMBuffer.assignProperty(target, 'src', '');
     };
 
     module.exports = ImageSurface;

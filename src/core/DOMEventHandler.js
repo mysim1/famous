@@ -18,10 +18,12 @@ define(function (require, exports, module) {
   var EventEmitter = require('./EventEmitter.js');
   var DOMBuffer = require('./DOMBuffer');
 
+  var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
   //TODO Add more to complete list
   var singleElementEvents = [
     'submit', 'focus', 'blur', 'load', 'unload', 'change', 'reset', 'scroll'
-  ];
+  ].concat(iOS ? ['click', 'touchstart', 'touchend'] : []);
 
   var initializedListeners = {};
 
@@ -29,7 +31,7 @@ define(function (require, exports, module) {
     return typeof document.body["on" + eventName] !== "undefined"
       ||
         /* Needed because otherwise not able to use mobile emulation in browser! */
-      ['touchmove', 'touchstart', 'touchend'].includes(eventName);
+      ['touchmove', 'touchstart', 'touchend'].includes(eventName)
   };
 
   DOMEventHandler.addEventListener = function(id, element, type, callback){
@@ -40,7 +42,7 @@ define(function (require, exports, module) {
     if(singleElementEvents.includes(type)){
       return element.addEventListener(type, callback);
     }
-    DOMBuffer.setAttribute(element, 'data-arvaid', id);
+    DOMBuffer.setAttribute(element, 'data-arvaid', id); //TODO see if this can be replaced by symbols for performance
     var eventEmitter = initializedListeners[type];
     if(!eventEmitter){
       eventEmitter = initializedListeners[type] = new EventEmitter();
@@ -58,7 +60,7 @@ define(function (require, exports, module) {
 
   DOMEventHandler.removeEventListener = function(element, id, type, callback) {
     if(singleElementEvents.includes(type)){
-      return element.addEventListener(type, callback);
+      return element.removeEventListener(type, callback);
     }
     if(initializedListeners[type]){
       initializedListeners[type].removeListener(id, callback);

@@ -253,40 +253,41 @@ define(function (require, exports, module) {
     return this.content;
   };
 
-    /**
-     * Set options for this surface
-     *
-     * @method setOptions
-     * @chainable
-     * @param {Object} [options] overrides for default options.  See constructor.
-     */
-    Surface.prototype.setOptions = function setOptions(options) {
-        if (options.size) this.setSize(options.size);
-        if (options.classes) this.setClasses(options.classes);
-        if (options.properties) this.setProperties(options.properties);
-        if (options.attributes) this.setAttributes(options.attributes);
-        if (options.content) this.setContent(options.content);
-        return this;
-    };
-    /**
-     * Set options for this surface
-     *
-     * @method setOptions
-     * @chainable
-     * @param {Object} [options] overrides for default options.  See constructor.
-     */
-    Surface.prototype.setNewOptions = function setOptions(options) {
-        this.setSize(null);
-        this.setClasses([]);
-        /* Properties need to be set manually as well since setProperties only extend the properties, and not
-        *  resetting them */
-        this.properties = {};
-        this.setProperties({});
-        this.setAttributes({});
-        this.setContent(null);
-        this.setOptions(options);
-        return this;
-    };
+
+  /**
+   * Set options for this surface
+   *
+   * @method setOptions
+   * @chainable
+   * @param {Object} [options] overrides for default options.  See constructor.
+   */
+  Surface.prototype.setOptions = function setOptions(options) {
+    if (options.size) this.setSize(options.size);
+    if (options.classes) this.setClasses(options.classes);
+    if (options.properties) this.setProperties(options.properties);
+    if (options.attributes) this.setAttributes(options.attributes);
+    if (options.content) this.setContent(options.content);
+    return this;
+  };
+  /**
+   * Set options for this surface
+   *
+   * @method setOptions
+   * @chainable
+   * @param {Object} [options] overrides for default options.  See constructor.
+   */
+  Surface.prototype.setNewOptions = function setOptions(options) {
+    this.setSize(null);
+    this.setClasses([]);
+    /* Properties need to be set manually as well since setProperties only extend the properties, and not
+     *  resetting them */
+    this.properties = {};
+    this.setProperties({});
+    this.setAttributes({});
+    this.setContent(null);
+    this.setOptions(options);
+    return this;
+  };
 
   //  Apply to document all changes from removeClass() since last setup().
   function _cleanupClasses(target) {
@@ -391,13 +392,13 @@ define(function (require, exports, module) {
     var target = this._currentTarget;
     var size = context.size;
 
-        if (this._classesDirty) {
-            _cleanupClasses.call(this, target);
-            var classList = this.getClassList();
-            for (var i = 0; i < classList.length; i++) target.classList.add(classList[i]);
-            this._classesDirty = false;
-            this._trueSizeCheck = true;
-        }
+    if (this._classesDirty) {
+      _cleanupClasses.call(this, target);
+      var classList = this.getClassList();
+      for (var i = 0; i < classList.length; i++) target.classList.add(classList[i]);
+      this._classesDirty = false;
+      this._trueSizeCheck = true;
+    }
 
     if (this._stylesDirty) {
       _applyStyles.call(this, target);
@@ -588,5 +589,5 @@ define(function (require, exports, module) {
     return this;
   };
 
-    module.exports = Surface;
+  module.exports = Surface;
 });

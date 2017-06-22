@@ -9,6 +9,7 @@
 
 define(function (require, exports, module) {
   var Context = require('./Context.js');
+  var DOMBuffer = require('./DOMBuffer');
 
   /**
    * Internal helper object to Context that handles the process of
@@ -42,11 +43,13 @@ define(function (require, exports, module) {
     if (container === oldContainer) return;
 
     if (oldContainer instanceof DocumentFragment) {
-      container.appendChild(oldContainer);
+      DOMBuffer.appendChild(container, oldContainer);
     }
     else {
-      while (oldContainer.hasChildNodes()) {
-        container.appendChild(oldContainer.firstChild);
+      var children = oldContainer.childNodes || [];
+      //TODO Confirm that this works
+      for(var i = 0;i< children.length; i++){
+        DOMBuffer.appendChild(container, children[i]);
       }
     }
 
@@ -59,6 +62,7 @@ define(function (require, exports, module) {
    * @private
    * @method allocate
    *
+   * @param {Object} options
    * @param {String} options.type type of element, e.g. 'div'
    * @param {Boolean} options.insertFirst Whether it should be allocated from the top instead of the bottom
    * or at the end. Defaults to false (at the bottom).
@@ -106,9 +110,9 @@ define(function (require, exports, module) {
   ElementAllocator.prototype._allocateNewHtmlOutput = function _allocateNewElementOutput(type, insertFirst) {
     var result = document.createElement(type);
     if (insertFirst) {
-      this.container.insertBefore(result, this.container.firstChild);
+      DOMBuffer.insertBefore(this.container, result, this.container.firstChild);
     } else {
-      this.container.appendChild(result);
+      DOMBuffer.appendChild(this.container, result);
     }
     return result;
   };

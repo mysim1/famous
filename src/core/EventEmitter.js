@@ -64,21 +64,32 @@ define(function(require, exports, module) {
     return this;
   };
 
-    /**
+  /**
    * Listens once
    * @param type
    * @param handler
-   * @returns {EventHandler}
+   * @returns {Mocked Promise}
    */
-  EventEmitter.prototype.once = function once(type, handler, listenUpstream) {
-    if(!listenUpstream)
-    return new Promise((resolve) => {
-      return this.on(type, function onceWrapper() {
-        this.removeListener(type, onceWrapper);
-        handler.apply(this._owner,arguments);
-        resolve(...arguments);
-      }, this);
-    });
+  EventEmitter.prototype.once = function once(type, handler) {
+    var resolvers = [], resolveValue, isResolved = false;
+    var promise = {then: function(resolveFunction){
+      if(isResolved){
+        resolveFunction(resolveValue)
+      } else {
+        resolvers.push(resolveFunction);
+      }
+    }};
+    this.on(type, function onceWrapper() {
+      this.removeListener(type, onceWrapper);
+      handler && handler.apply(this._owner, arguments);
+      resolveValue = arguments[0];
+      isResolved = true;
+      for(var i=0; i<resolvers.length; i++){
+        resolvers[i](resolveValue);
+      }
+    }, this);
+
+    return promise;
   };
 
   /**

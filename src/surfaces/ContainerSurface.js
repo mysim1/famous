@@ -96,20 +96,13 @@ define(function (require, exports, module) {
    * @private
    * @method commit
    * @param {Context} context commit context
-   * @param {Transform} transform unused TODO
-   * @param {Number} opacity  unused TODO
-   * @param {Array.Number} origin unused TODO
-   * @param {Array.Number} size unused TODO
    * @return {undefined} TODO returns an undefined value
    */
-  ContainerSurface.prototype.commit = function commit(context, transform, opacity, origin, size) {
+  ContainerSurface.prototype.commit = function commit(context) {
     var previousSize = this._size ? [this._size[0], this._size[1]] : null;
     var result = Surface.prototype.commit.apply(this, arguments);
-    if (this._shouldRecalculateSize || (previousSize && (this._size[0] !== previousSize[0] || this._size[1] !== previousSize[1]))) {
-      this.context.setSize();
-      this._shouldRecalculateSize = false;
-    }
-    this.context.update();
+    this.context.setSize(context.size);
+    this.context.update({hide: context.opacity === 0 || context.hide});
     return result;
   };
 

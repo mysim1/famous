@@ -116,7 +116,6 @@ define(function (require, exports, module) {
   Group.prototype.deallocate = function deallocate(allocator) {
     this.context.cleanup(this._allocator);
     return allocator.deallocateAllocator(this._allocator);
-    this._allocator = {};
   };
 
 
@@ -150,6 +149,7 @@ define(function (require, exports, module) {
       allocator: this._allocator,
       transform: Transform.translate(-origin[0] * size[0], -origin[1] * size[1], 0),
       origin: origin,
+      hide: context.opacity === 0 || context.hide,
       size: size
     });
     return result;

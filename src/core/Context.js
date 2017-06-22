@@ -146,6 +146,8 @@ define(function (require, exports, module) {
       if (contextParameters.origin) this._nodeContext.origin = contextParameters.origin;
       if (contextParameters.align) this._nodeContext.align = contextParameters.align;
       if (contextParameters.size) this._nodeContext.size = contextParameters.size;
+      if (contextParameters.size) this._nodeContext.size = contextParameters.size;
+      this._nodeContext.hide = contextParameters.hide;
       if (contextParameters.allocator) {
         this._nodeContext.allocator = contextParameters.allocator;
       } else {

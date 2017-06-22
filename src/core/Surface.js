@@ -68,7 +68,7 @@ define(function (require, exports, module) {
    */
   Surface.prototype.setAttributes = function setAttributes(attributes) {
     for (var n in attributes) {
-      if (n === 'style') throw new Error('Cannot set styles via "setAttributes" as it will break Famo.us.  Use "setProperties" instead.');
+      if (n === 'style') throw new Error('Cannot set styles via "setAttributes". Use "setProperties" instead.');
       this.attributes[n] = attributes[n];
       /* Remove the attribute that is about to be removed, if applicable */
       var attributeToBeRemovedIndex = this._dirtyAttributes.indexOf(n);
@@ -266,6 +266,25 @@ define(function (require, exports, module) {
         if (options.properties) this.setProperties(options.properties);
         if (options.attributes) this.setAttributes(options.attributes);
         if (options.content) this.setContent(options.content);
+        return this;
+    };
+    /**
+     * Set options for this surface
+     *
+     * @method setOptions
+     * @chainable
+     * @param {Object} [options] overrides for default options.  See constructor.
+     */
+    Surface.prototype.setNewOptions = function setOptions(options) {
+        this.setSize(null);
+        this.setClasses([]);
+        /* Properties need to be set manually as well since setProperties only extend the properties, and not
+        *  resetting them */
+        this.properties = {};
+        this.setProperties({});
+        this.setAttributes({});
+        this.setContent(null);
+        this.setOptions(options);
         return this;
     };
 

@@ -277,7 +277,6 @@ define(function (require, exports, module) {
    * @param {Object} [options] overrides for default options.  See constructor.
    */
   Surface.prototype.setNewOptions = function setOptions(options) {
-    this.setSize(null);
     this.setClasses([]);
     /* Properties need to be set manually as well since setProperties only extend the properties, and not
      *  resetting them */

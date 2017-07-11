@@ -183,7 +183,7 @@ define(function(require, exports, module) {
   EventHandler.prototype.once = function once(type, handler, listenUpstream) {
     if(!listenUpstream)
       listenUpstream = true;
-    EventEmitter.prototype.once(this, type);
+    EventEmitter.prototype.once.call(this, type, handler);
     return this;
   };
 

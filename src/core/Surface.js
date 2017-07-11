@@ -49,6 +49,7 @@ define(function (require, exports, module) {
     this._dirtyAttributes = [];
 
     if (options) this.setOptions(options);
+    this.options = options || {};
 
     this._currentTarget = null;
   }
@@ -427,8 +428,8 @@ define(function (require, exports, module) {
         DOMBuffer.assignProperty(target.style, 'width', resolvedWidth);
         DOMBuffer.assignProperty(target.style, 'height', resolvedHeight);
       }
-
       this._eventOutput.emit('resize');
+      this._sizeDirty = false;
     }
 
     if (this._contentDirty) {

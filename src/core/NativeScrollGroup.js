@@ -22,7 +22,7 @@ define(function (require, exports, module) {
     Group.call(this, options);
   }
 
-  staticInherits(Group, NativeScrollGroup);
+  staticInherits(NativeScrollGroup, Group);
 
   NativeScrollGroup.prototype.commit = function commit(context) {
     this._surfaceSize = context.size;

@@ -28,5 +28,5 @@ var objectAssign = function (target, varArgs) { // .length of function is 2
 
 export function staticInherits(inheritsTo, inheritsFrom) {
   objectAssign(inheritsTo, inheritsFrom);
-  inheritsTo.prototype = Object.create(inheritsFrom);
+  inheritsTo.prototype = Object.create(inheritsFrom.prototype);
 }

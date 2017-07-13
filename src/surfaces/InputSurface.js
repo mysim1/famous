@@ -51,6 +51,7 @@ define(function (require, exports, module) {
     this._type        = options.type || 'text';
     this._name        = options.name || '';
     this._contentDirty = true;
+    Surface.prototype.setOptions.call(this, options);
   };
 
     /**

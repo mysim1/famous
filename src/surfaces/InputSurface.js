@@ -46,26 +46,34 @@ define(function (require, exports, module) {
   InputSurface.prototype.elementClass = 'famous-surface';
 
   InputSurface.prototype.setOptions = function setOptions(options) {
-    this._placeholder = options.placeholder !== undefined ? options.placeholder : '';
-    this._value       = options.value !== undefined ? options.value : '';
-    this._type        = options.type || 'text';
-    this._name        = options.name || '';
-    this._contentDirty = true;
+    var newPlaceholder = options.placeholder !== undefined ? options.placeholder : '',
+      newValue = options.value !== undefined ? options.value : '',
+      newType = options.type || 'text',
+      newName = options.name || '';
+    this._contentDirty = newPlaceholder !== this._placeholder
+      || newValue !== this._value
+      || newType !== this._type
+      || newName !== this._name;
+    this._placeholder = newPlaceholder;
+    this._value       = newValue;
+    this._type        = newType;
+    this._name        = newName;
+
     Surface.prototype.setOptions.call(this, options);
   };
 
-    /**
-     * Set placeholder text.  Note: Triggers a repaint.
-     *
-     * @method setPlaceholder
-     * @param {string} str Value to set the placeholder to.
-     * @return {InputSurface} this, allowing method chaining.
-     */
-    InputSurface.prototype.setPlaceholder = function setPlaceholder(str) {
-        this._placeholder = str;
-        this._contentDirty = true;
-        return this;
-    };
+  /**
+   * Set placeholder text.  Note: Triggers a repaint.
+   *
+   * @method setPlaceholder
+   * @param {string} str Value to set the placeholder to.
+   * @return {InputSurface} this, allowing method chaining.
+   */
+  InputSurface.prototype.setPlaceholder = function setPlaceholder(str) {
+    this._placeholder = str;
+    this._contentDirty = true;
+    return this;
+  };
 
   /**
    * Focus on the current input, pulling up the keyboard on mobile.

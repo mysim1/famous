@@ -229,16 +229,6 @@ define(function (require, exports, module) {
    * @method initialize
    */
   function initialize() {
-
-    // prevent scrolling via browser
-    window.addEventListener('touchmove', function (event) {
-      if (event.target.tagName === 'TEXTAREA' || this.touchMoveEnabled) {
-        return true;
-      } else {
-        event.preventDefault();
-      }
-    }.bind(this), { capture: true, passive: false });
-
     addRootClasses();
   }
 

@@ -251,7 +251,7 @@ define(function (require, exports, module) {
     if (options.classes) this.setClasses(options.classes);
     if (options.properties) this.setProperties(options.properties);
     if (options.attributes) this.setAttributes(options.attributes);
-    if (options.content) this.setContent(options.content);
+    if (options.content !== undefined) this.setContent(options.content);
     this.options = options;
     return this;
   };

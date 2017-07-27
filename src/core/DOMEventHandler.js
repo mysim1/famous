@@ -52,7 +52,7 @@ define(function (require, exports, module) {
         if(receivedID){
           eventEmitter.emit(receivedID, event);
         }
-      });
+      }, {passive: true});
     }
     eventEmitter.on(id, callback);
 

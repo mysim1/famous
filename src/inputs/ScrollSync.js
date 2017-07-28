@@ -66,7 +66,7 @@ define(function(require, exports, module) {
     scale: 1,
     stallTime: 50,
     lineHeight: 40,
-    preventDefault: true
+    preventDefault: false
   };
 
   ScrollSync.DIRECTION_X = 0;

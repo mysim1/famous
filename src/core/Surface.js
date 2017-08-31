@@ -115,9 +115,11 @@ define(function (require, exports, module) {
    */
   Surface.prototype.setProperties = function setProperties(properties) {
     for (var n in properties) {
-      this.properties[n] = properties[n];
+      if(this.properties[n] !== properties[n]){
+        this.properties[n] = properties[n];
+        this._stylesDirty = true;
+      }
     }
-    this._stylesDirty = true;
     return this;
   };
 

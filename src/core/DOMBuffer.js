@@ -93,6 +93,8 @@ define(function (require, exports, module) {
             descendants[i].setAttribute(data[1], data[2]);
           }
           break;
+        default:
+          throw new Error(`Internal problem in DOMBuffer: Unkown operation: "${operationName}"`);
       }
     }
     enqueuedOperations = [];

@@ -3,6 +3,7 @@
  */
 define(function (require, exports, module) {
   var Group = require('./Group.js');
+  var DOMBuffer = require('./DOMBuffer.js');
   var staticInherits = require('../utilities/StaticInherit.js').staticInherits;
 
 
@@ -40,9 +41,10 @@ define(function (require, exports, module) {
    */
 
   NativeScrollGroup.prototype.setScrollOffset = function setScrollOffset(offset) {
+
     var element = this._element;
     if (element) {
-      element.scrollTop = offset || this._cachedScrollOffset;
+      DOMBuffer.assignProperty(element, 'scrollTop', offset || this._cachedScrollOffset);
       this._cachedScrollOffset = undefined;
     } else {
       /* Save to cache and set on deploy instead */
@@ -78,6 +80,10 @@ define(function (require, exports, module) {
       return element.scrollHeight - this._surfaceSize[1];
     }
     return 0;
+  };
+
+  NativeScrollGroup.prototype.getScrollHeight = function getScrollHeight() {
+    return this._element &&  this._element.scrollHeight || 0;
   };
 
   NativeScrollGroup.prototype.scrollToBottom = function getScrollOffset() {

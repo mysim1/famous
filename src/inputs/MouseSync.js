@@ -93,7 +93,7 @@ define(function(require, exports, module) {
         scale: 1,
         propogate: true,  // events piped to document on mouseleave
         velocitySampleLength: 10,
-        preventDefault: true
+        preventDefault: false
     };
 
     MouseSync.DIRECTION_X = 0;

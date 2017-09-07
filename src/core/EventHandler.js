@@ -148,12 +148,16 @@ define(function(require, exports, module) {
    *
    * @param {string} type event type key (for example, 'click')
    * @param {function(string, Object)} handler callback
-   * @param {Boolean} listenUpstream defaults to true. If the events should bubble
+   * @param {Object} options options
+   * @param {Boolean} [options.propagate] defaults to true. If the events should bubble
    * @return {EventHandler} this
    */
-  EventHandler.prototype.on = function on(type, handler, listenUpstream) {
-    if(!listenUpstream)
+  EventHandler.prototype.on = function on(type, handler, options) {
+    options = options || {};
+    let listenUpstream = options.propagate;
+    if(listenUpstream === undefined){
       listenUpstream = true;
+    }
     EventEmitter.prototype.on.call(this, type, handler, listenUpstream);
     if (!(type in this.upstreamListeners) && listenUpstream) {
       var upstreamListener = this.trigger.bind(this, type);
@@ -177,13 +181,16 @@ define(function(require, exports, module) {
    * Listens once
    * @param type
    * @param handler
-   * @param {Boolean} listenUpstream Whether we should listen for piped events
+   * @param {Object} options options
+   * @param {Boolean} [options.propagate] Whether we should listen for bubbled events
    * @returns {EventHandler}
    */
-  EventHandler.prototype.once = function once(type, handler, listenUpstream) {
-    if(!listenUpstream)
-      listenUpstream = true;
-    EventEmitter.prototype.once.call(this, type, handler);
+  EventHandler.prototype.once = function once(type, handler, options) {
+    options = options || {};
+    let propagate = options.propagate;
+    if(propagate === undefined)
+      propagate = true;
+    EventEmitter.prototype.once.call(this, type, handler, {propagate: propagate});
     return this;
   };
 

@@ -68,9 +68,11 @@ define(function(require, exports, module) {
    * Listens once
    * @param type
    * @param handler
+   * @param {Object} options
+   * @param {Boolean} options.propagate Whether we should listen for bubbled events
    * @returns {Mocked Promise}
    */
-  EventEmitter.prototype.once = function once(type, handler) {
+  EventEmitter.prototype.once = function once(type, handler, options) {
     var resolvers = [], resolveValue, isResolved = false;
     var promise = {then: function(resolveFunction){
       if(isResolved){
@@ -87,7 +89,7 @@ define(function(require, exports, module) {
       for(var i=0; i<resolvers.length; i++){
         resolvers[i](resolveValue);
       }
-    }, this);
+    }, options);
 
     return promise;
   };

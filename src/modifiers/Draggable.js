@@ -151,7 +151,7 @@ define(function(require, exports, module) {
 
   function _handleEnd(data) {
     if (!this._active) return;
-    this.eventOutput.emit('end', {data, position : this.getPosition()});
+    this.eventOutput.emit('end', {data: data, position : this.getPosition()});
   }
 
   function _bindEvents() {

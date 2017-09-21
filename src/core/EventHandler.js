@@ -145,15 +145,18 @@ define(function(require, exports, module) {
    *
    * @param {string} type event type key (for example, 'click')
    * @param {function(string, Object)} handler callback
+   * @param options
    * @return {EventHandler} this
    */
-  EventHandler.prototype.on = function on(type, handler) {
+  EventHandler.prototype.on = function on(type, handler, options) {
     EventEmitter.prototype.on.apply(this, arguments);
     if (!(type in this.upstreamListeners)) {
-      var upstreamListener = this.trigger.bind(this, type);
+      var upstreamListener = this.emit.bind(this, type);
+      /* Make sure that the options are passed along */
+      upstreamListener._handlerOptions = options || handler._handlerOptions;
       this.upstreamListeners[type] = upstreamListener;
       for (var i = 0; i < this.upstream.length; i++) {
-        this.upstream[i].on(type, upstreamListener);
+        this.upstream[i].on(type, upstreamListener, options);
       }
     }
     return this;
@@ -182,14 +185,16 @@ define(function(require, exports, module) {
    * @method subscribe
    *
    * @param {EventEmitter} source source emitter object
+   * @param options
    * @return {EventHandler} this
    */
-  EventHandler.prototype.subscribe = function subscribe(source) {
+  EventHandler.prototype.subscribe = function subscribe(source, options) {
     var index = this.upstream.indexOf(source);
     if (index < 0) {
       this.upstream.push(source);
       for (var type in this.upstreamListeners) {
-        source.on(type, this.upstreamListeners[type]);
+        var handler = this.upstreamListeners[type];
+        source.on(type, this.upstreamListeners[type], options);
       }
     }
     return this;

@@ -46,7 +46,8 @@ define(function(require, exports, module) {
 
         this._eventOutput = new EventHandler();
         this._touchTracker = new TouchTracker({
-            touchLimit: this.options.touchLimit
+            touchLimit: this.options.touchLimit,
+            axis: this.options.axis
         });
 
         EventHandler.setOutputHandler(this, this._eventOutput);

@@ -18,6 +18,12 @@ define(function(require, exports, module) {
   var TouchSync = require('../inputs/TouchSync');
   GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
 
+  //binary representation of directions for bitwise operations
+  var _direction = {
+    x : 0x01,         //001
+    y : 0x02          //010
+  };
+
   /**
    * Makes added render nodes responsive to drag beahvior.
    *   Emits events 'start', 'update', 'end'.
@@ -36,7 +42,12 @@ define(function(require, exports, module) {
    */
   function Draggable(options) {
     this.options = Object.create(Draggable.DEFAULT_OPTIONS);
-    this.sync = new GenericSync('ontouchstart' in document.documentElement ? ['touch'] : ['mouse', 'touch'], {scale : this.options.scale});
+    this.projection = this.getProjectionParameter(options);
+    var axis = this.getAxis();
+    this.sync = new GenericSync('ontouchstart' in document.documentElement ? ['touch'] : ['mouse', 'touch'], {
+      scale : this.options.scale,
+      axis: axis
+    });
     if (options) this.setOptions(options);
 
     this._positionState = new Transitionable([0,0]);
@@ -51,11 +62,7 @@ define(function(require, exports, module) {
     _bindEvents.call(this);
   }
 
-  //binary representation of directions for bitwise operations
-  var _direction = {
-    x : 0x01,         //001
-    y : 0x02          //010
-  };
+
 
   Draggable.DIRECTION_X = _direction.x;
   Draggable.DIRECTION_Y = _direction.y;
@@ -75,7 +82,7 @@ define(function(require, exports, module) {
 
   function _mapDifferential(differential) {
     var opts        = this.options;
-    var projection  = opts.projection;
+    var projection  = this.projection;
     var snapX       = opts.snapX;
     var snapY       = opts.snapY;
     var rangeX      = opts.xRange;
@@ -149,9 +156,9 @@ define(function(require, exports, module) {
     this.eventOutput.emit('update', {position : pos});
   }
 
-  function _handleEnd() {
+  function _handleEnd(data) {
     if (!this._active) return;
-    this.eventOutput.emit('end', {position : this.getPosition()});
+    this.eventOutput.emit('end', {data: data, position : this.getPosition()});
   }
 
   function _bindEvents() {
@@ -169,13 +176,6 @@ define(function(require, exports, module) {
    */
   Draggable.prototype.setOptions = function setOptions(options) {
     var currentOptions = this.options;
-    if (options.projection !== undefined) {
-      var proj = options.projection;
-      this.options.projection = 0;
-      ['x', 'y'].forEach(function(val) {
-        if (proj.indexOf(val) !== -1) currentOptions.projection |= _direction[val];
-      });
-    }
     if (options.scale  !== undefined) {
       currentOptions.scale  = options.scale;
       this.sync.setOptions({
@@ -198,6 +198,17 @@ define(function(require, exports, module) {
   Draggable.prototype.getPosition = function getPosition() {
     return this._positionState.get();
   };
+
+  Draggable.prototype.getProjectionParameter = function adjustProjectionParameter(options) {
+    if (options.projection !== undefined) {
+      var proj = options.projection || [];
+      var actualProjection = 0;
+      ['x', 'y'].forEach(function(val) {
+        if (proj.indexOf(val) !== -1) actualProjection |= _direction[val];
+      });
+    }
+    return actualProjection;
+  }
 
   /**
    * Transition the element to the desired relative position via provided transition.
@@ -261,7 +272,22 @@ define(function(require, exports, module) {
     this._active = !this._active;
   };
 
+
   /**
+   * Gets the axis on which the Draggable is locked. If not locked, returns undefined
+   *
+   * @returns {Number|undefined}
+   */
+  Draggable.prototype.getAxis = function getAxis() {
+    var axis;
+    if(this.projection === _direction.x){
+      axis = 0;
+    } else if(this.projection === _direction.y) {
+      axis = 1
+    }
+    return axis;
+  }
+    /**
    * Return render spec for this Modifier, applying to the provided
    *    target component.  This is similar to render() for Surfaces.
    *

@@ -94,8 +94,6 @@ define(function(require, exports, module) {
   }
 
   function _handleMove(event) {
-    if (this.options.preventDefault) event.preventDefault();
-
     if (!this._inProgress) {
       this._inProgress = true;
       this._position = (this.options.direction === undefined) ? [0,0] : 0;
@@ -116,8 +114,16 @@ define(function(require, exports, module) {
     var currTime = _now();
     var prevTime = this._prevTime || currTime;
 
-    var diffX = (event.wheelDeltaX !== undefined) ? event.wheelDeltaX : -event.deltaX;
-    var diffY = (event.wheelDeltaY !== undefined) ? event.wheelDeltaY : -event.deltaY;
+    var diffX, diffY;
+
+    if(!event.wheelDeltaX || !event.wheelDeltaY){
+      diffX = 0;
+      diffY = event.wheelDelta;
+    } else {
+      diffX = (event.wheelDeltaX !== undefined) ? event.wheelDeltaX : -event.deltaX;
+      diffY = (event.wheelDeltaY !== undefined) ? event.wheelDeltaY : -event.deltaY;
+    }
+
 
     if (event.deltaMode === 1) { // units in lines, not pixels
       diffX *= this.options.lineHeight;

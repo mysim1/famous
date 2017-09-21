@@ -88,6 +88,7 @@ define(function(require, exports, module) {
      * @param {Object} options default options overrides
      * @param [options.selective] {Boolean} selective if false, saves state for each touch
      * @param [options.touchLimit] {Number} touchLimit upper bound for emitting events based on number of touches
+     * @param [options.axis] {Number} 0 or 1, if only listening for movement on one axis
      */
     function TouchTracker(options) {
         this.selective = options.selective;
@@ -101,11 +102,11 @@ define(function(require, exports, module) {
         EventHandler.setInputHandler(this, this.eventInput);
         EventHandler.setOutputHandler(this, this.eventOutput);
 
-        this.eventInput.on('touchstart', _handleStart.bind(this));
-        this.eventInput.on('touchmove', _handleMove.bind(this));
-        this.eventInput.on('touchend', _handleEnd.bind(this));
-        this.eventInput.on('touchcancel', _handleEnd.bind(this));
-        this.eventInput.on('unpipe', _handleUnpipe.bind(this));
+        this.eventInput.on('touchstart', _handleStart.bind(this), {axis: options.axis});
+        this.eventInput.on('touchmove', _handleMove.bind(this), {axis: options.axis});
+        this.eventInput.on('touchend', _handleEnd.bind(this),  {axis: options.axis});
+        this.eventInput.on('touchcancel', _handleEnd.bind(this), {axis: options.axis});
+        this.eventInput.on('unpipe', _handleUnpipe.bind(this), {axis: options.axis});
 
         this.isTouched = false;
     }

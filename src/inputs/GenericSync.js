@@ -34,6 +34,7 @@ define(function(require, exports, module) {
         EventHandler.setOutputHandler(this, this._eventOutput);
 
         this._syncs = {};
+        this.options = options;
         if (syncs) this.addSync(syncs);
         if (options) this.setOptions(options);
     }
@@ -81,9 +82,9 @@ define(function(require, exports, module) {
      * @method pipeSync
      * @param key {String} identifier for sync class
      */
-    GenericSync.prototype.pipeSync = function pipeToSync(key) {
+    GenericSync.prototype.pipeSync = function pipeToSync(key, options) {
         var sync = this._syncs[key];
-        this._eventInput.pipe(sync);
+        this._eventInput.pipe(sync, options);
         sync.pipe(this._eventOutput);
     };
 
@@ -101,8 +102,9 @@ define(function(require, exports, module) {
 
     function _addSingleSync(key, options) {
         if (!registry[key]) return;
-        this._syncs[key] = new (registry[key])(options);
-        this.pipeSync(key);
+        var optionsToPassOn = options || this.options;
+        this._syncs[key] = new (registry[key])(optionsToPassOn);
+        this.pipeSync(key, optionsToPassOn);
     }
 
     /**

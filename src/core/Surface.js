@@ -8,9 +8,9 @@
  * this class to ES6 for purpose of unifying Arva's development environment.
  */
 
-import ElementOutput        from './ElementOutput.js';
-import DOMBuffer            from './DOMBuffer.js';
-import RenderablePrototype  from '../utilities/RenderablePrototype.js';
+import ElementOutput           from './ElementOutput.js';
+import DOMBuffer               from './DOMBuffer.js';
+import {RenderablePrototype/}  from '../utilities/RenderablePrototype.js';
 
 //var RenderablePrototype = require('../utilities/RenderablePrototype').RenderablePrototype;
 

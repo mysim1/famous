@@ -31,14 +31,14 @@ import RenderablePrototype  from '../utilities/RenderablePrototype.js';
  * @param {Array} [options.attributes] string dictionary of HTML attributes to set on target div
  * @param {string} [options.content] inner (HTML) content of surface
  */
- export class Surface extends ElementOutput {
+ export default class Surface extends ElementOutput {
 
    get elementType() { return 'div'; }
    get elementClass() { return 'famous-surface'; }
 
 
    constructor(options) {
-     
+
      super(options);
 
      this.options = {};

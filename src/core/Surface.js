@@ -38,6 +38,8 @@ import RenderablePrototype  from '../utilities/RenderablePrototype.js';
 
 
    constructor(options) {
+     
+     super(options);
 
      this.options = {};
 

@@ -208,8 +208,7 @@ import RenderablePrototype  from '../utilities/RenderablePrototype.js';
      return this;
    }
 
-/* TODO: how to solve the with ? its static right? */
-   Surface.with = function (options) {
+   static with(options) {
      /* Make an inherited version of the surface */
      return new RenderablePrototype(this, options);
    }

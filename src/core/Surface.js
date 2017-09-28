@@ -12,7 +12,6 @@ import ElementOutput           from './ElementOutput.js';
 import DOMBuffer               from './DOMBuffer.js';
 import {RenderablePrototype}   from '../utilities/RenderablePrototype.js';
 
-//var RenderablePrototype = require('../utilities/RenderablePrototype').RenderablePrototype;
 
 
 /**
@@ -33,8 +32,8 @@ import {RenderablePrototype}   from '../utilities/RenderablePrototype.js';
  */
  export default class Surface extends ElementOutput {
 
-   get elementType() { return 'div'; }
-   get elementClass() { return 'famous-surface'; }
+   static elementType = 'div';
+   static elementClass = 'famous-surface';
 
 
    constructor(options) {

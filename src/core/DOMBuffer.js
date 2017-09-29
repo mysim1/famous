@@ -6,7 +6,7 @@
 * @copyright Arva 2015-2017
 */
 
-export default DOMBuffer {
+export default class DOMBuffer {
 
   static enqueuedOperations = [];
 

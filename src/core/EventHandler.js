@@ -37,7 +37,7 @@
     * @param {Object} object object to mix trigger, subscribe, and unsubscribe functions into
     * @param {EventHandler} handler assigned event handler
     */
-   EventHandler.setInputHandler = function setInputHandler(object, handler) {
+   static setInputHandler(object, handler) {
      object.trigger = handler.trigger.bind(handler);
      if (handler.subscribe && handler.unsubscribe) {
        object.subscribe = handler.subscribe.bind(handler);
@@ -54,7 +54,7 @@
     * @param {Object} object object to mix pipe, unpipe, on, addListener, and removeListener functions into
     * @param {EventHandler} handler assigned event handler
     */
-   EventHandler.setOutputHandler = function setOutputHandler(object, handler) {
+   static setOutputHandler(object, handler) {
      if (handler instanceof EventHandler) handler.bindThis(object);
      object.pipe = handler.pipe.bind(handler);
      object.unpipe = handler.unpipe.bind(handler);
@@ -91,7 +91,10 @@
     * Alias for emit
     * @method addListener
     */
-   EventHandler.prototype.trigger = EventHandler.prototype.emit;
+   trigger(...arguments) {
+     return this.emit(...arguments);
+   }
+   //EventHandler.prototype.trigger = EventHandler.prototype.emit;
 
    /**
     * Add event handler object to set of downstream handlers.
@@ -196,7 +199,10 @@
     * Alias for "on"
     * @method addListener
     */
-   EventHandler.prototype.addListener = EventHandler.prototype.on;
+    addListener(...arguments) {
+      return this.on(...arguments);
+    }
+   //EventHandler.prototype.addListener = EventHandler.prototype.on;
 
    /**
     * Listen for events from an upstream event handler.

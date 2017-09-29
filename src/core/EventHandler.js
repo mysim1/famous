@@ -18,7 +18,7 @@
   */
  export default class EventHandler extends EventEmitter {
 
-   constructor(...arguments) {
+   constructor() {
      super(arguments);
 
      this.downstream = []; // downstream event handlers
@@ -91,8 +91,8 @@
     * Alias for emit
     * @method addListener
     */
-   trigger(...arguments) {
-     return this.emit(...arguments);
+   trigger() {
+     return this.emit(arguments);
    }
    //EventHandler.prototype.trigger = EventHandler.prototype.emit;
 
@@ -199,8 +199,8 @@
     * Alias for "on"
     * @method addListener
     */
-    addListener(...arguments) {
-      return this.on(...arguments);
+    addListener() {
+      return this.on(arguments);
     }
    //EventHandler.prototype.addListener = EventHandler.prototype.on;
 

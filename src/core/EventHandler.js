@@ -76,7 +76,8 @@
     * @return {EventHandler} this
     */
    emit(type, event) {
-     EventEmitter.prototype.emit.apply(this, arguments);
+     super.emit(type, event);
+     //EventEmitter.prototype.emit.apply(this, arguments);
      let i = 0;
      for (i = 0; i < this.downstream.length; i++) {
        if (this.downstream[i].trigger) this.downstream[i].trigger(type, event);

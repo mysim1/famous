@@ -11,7 +11,7 @@ import EventEmitter   from './EventEmitter.js';
 import DOMBuffer      from './DOMBuffer.js';
 
 
-export default DOMEventHandler {
+export default class DOMEventHandler {
 
   static iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 

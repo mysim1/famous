@@ -9,7 +9,7 @@
  */
 
 
-export default Entity {
+export default class Entity {
 
   /**
    * A singleton that maintains a global registry of Surfaces.

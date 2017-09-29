@@ -28,7 +28,7 @@
   *
   * @class Transform
   */
-export default Transform {
+export default class Transform {
 
   // WARNING: these matrices correspond to WebKit matrices, which are
   //    transposed from their math counterparts
@@ -669,7 +669,7 @@ export default Transform {
    * @static
    * @final
    */
-  static const inFront = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1e-3, 1];
+  static inFront = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1e-3, 1];
 
   /**
    * (Property) Array defining a translation backwards in z by 1
@@ -678,7 +678,5 @@ export default Transform {
    * @static
    * @final
    */
-  static const behind = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1e-3, 1];
-
-
+  static behind = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1e-3, 1];
 }

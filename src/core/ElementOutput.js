@@ -27,14 +27,14 @@
   */
  export default class ElementOutput {
 
-   static const usePrefix = !('transform' in document.documentElement.style);
+   static usePrefix = !('transform' in document.documentElement.style);
 
-   static const transformConstants = {
+   static transformConstants = {
      transform: usePrefix?'webkitTransform':'transform',
      origin: usePrefix?'webkitTransform': 'transformOrigin'
    };
 
-   static const devicePixelRatio = window.devicePixelRatio || 1;
+   static devicePixelRatio = window.devicePixelRatio || 1;
 
 
    constructor(element) {
@@ -201,7 +201,7 @@
     }
 
    // format origin as CSS percentage string
-   function _formatCSSOrigin(origin) {
+   _formatCSSOrigin(origin) {
        return (100 * origin[0]) + '% ' + (100 * origin[1]) + '%';
    }
 
@@ -216,7 +216,7 @@
      DOMBuffer.assignProperty(element.style, 'opacity', '0');
    }
 
-   function _xyNotEquals(a, b) {
+   _xyNotEquals(a, b) {
        return (a && b) ? (a[0] !== b[0] || a[1] !== b[1]) : a !== b;
    }
 

@@ -38,38 +38,40 @@ export default class Engine {
     return isWindowPerformance?window.performance.now():Date.now();
   }
 
+  static contexts = [];
 
-  var Engine = {};
+  static nextTickQueue = [];
 
-  var contexts = [];
+  static currentFrame = 0;
+  static nextTickFrame = 0;
 
-  var nextTickQueue = [];
-
-  var currentFrame = 0;
-  var nextTickFrame = 0;
-
-  var deferQueue = [];
+  static deferQueue = [];
 
   /* The last timestamp of the previous frame */
-  var lastTime = getTime();
+  static lastTime = getTime();
 
-  var frameTime;
-  var frameTimeLimit;
-  var loopEnabled = true;
-  var eventForwarders = {};
-  var eventHandler = new EventHandler();
+  static frameTime;
+  static frameTimeLimit;
+  static loopEnabled = true;
+  static eventForwarders = {};
+  static eventHandler = new EventHandler();
 
-  var options = {
+  static initialized = false;
+  static touchMoveEnabled = true;
+  static canvas;
+
+  static options = {
     containerType: 'div',
     containerClass: 'famous-container',
     fpsCap: undefined,
     runLoop: true,
     appMode: true
-  };
-  var optionsManager = new OptionsManager(options);
+  }
+
+  static optionsManager = new OptionsManager(options);
 
   /** @const */
-  var MAX_DEFER_FRAME_TIME = 10;
+  static MAX_DEFER_FRAME_TIME = 10;
 
 
   static PriorityLevels = {
@@ -164,19 +166,6 @@ export default class Engine {
     return this._lastFrameTimeDelta;
   }
 
-  // engage requestAnimationFrame
-  loop() {
-    if (options.runLoop) {
-      Engine.step();
-      window.requestAnimationFrame(loop);
-    }
-    else loopEnabled = false;
-  }
-
-  if (typeof window !== 'undefined') {
-    window.requestAnimationFrame(loop);
-  }
-
   //
   // Upon main document window resize (unless on an "input" HTML element):
   //   scroll to the top left corner of the window,
@@ -190,21 +179,11 @@ export default class Engine {
     eventHandler.emit('resize');
   }
 
-  if (typeof window !== 'undefined') {
-
-    window.addEventListener('resize', handleResize, false);
-    handleResize();
-
-    window.addEventListener('resize', handleResize, false);
-    handleResize();
+  static getPriorityLevel() {
+    return this._priorityLevel;
   }
 
-  Engine.touchMoveEnabled = true;
-
-  Engine.getPriorityLevel = function () {
-    return this._priorityLevel;
-  };
-  Engine.disableTouchMove = function disableTouchMove() {
+  static disableTouchMove() {
     if (this.touchMoveEnabled) {
       // prevent scrolling via browser
       window.addEventListener('touchmove', function (event) {
@@ -226,13 +205,11 @@ export default class Engine {
    * @private
    * @method initialize
    */
-  function initialize() {
+  static initialize() {
     addRootClasses();
   }
 
-  var initialized = false;
-
-  function addRootClasses() {
+  static addRootClasses() {
     if (!document.body) {
       Engine.nextTick(addRootClasses);
       return;
@@ -242,7 +219,7 @@ export default class Engine {
     document.documentElement.classList.add('famous-root');
   }
 
-  var canvas;
+
   static getCachedCanvas() {
     if(!canvas){
       canvas = document.createElement('canvas');
@@ -484,7 +461,9 @@ export default class Engine {
     nextTickQueue.push(fn);
   }
 
-  Engine.now = getTime;
+  static now() {
+    return getTime(...arguments);
+  }
 
   /**
    * Queue a function to be executed sometime soon, at a time that is
@@ -498,8 +477,28 @@ export default class Engine {
   static defer(fn) {
     deferQueue.push(fn);
   }
+}
 
-  optionsManager.on('change', function (data) {
+// engage requestAnimationFrame
+function loop() {
+  if (options.runLoop) {
+    Engine.step();
+    window.requestAnimationFrame(loop);
+  }
+  else loopEnabled = false;
+}
+
+if (typeof window !== 'undefined') {
+  window.requestAnimationFrame(loop);
+
+  window.addEventListener('resize', Engine.handleResize, false);
+  Engine.handleResize();
+
+  //window.addEventListener('resize', handleResize, false);
+  //handleResize();
+
+
+  Engine.optionsManager.on('change', function (data) {
     if (data.id === 'fpsCap') Engine.setFPSCap(data.value);
     else if (data.id === 'runLoop') {
       // kick off the loop only if it was stopped
@@ -509,5 +508,4 @@ export default class Engine {
       }
     }
   });
-
 }

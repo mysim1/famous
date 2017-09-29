@@ -34,7 +34,7 @@ export default class EventEmitter {
    * @param {Objects}(opt) event event data
    * @return {EventHandler} this
    */
-  function emit() {
+   emit() {
     let type = arguments[0];
     let args = [];
     for (let i = 1; i < arguments.length; i++) {

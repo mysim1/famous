@@ -21,12 +21,12 @@ export default DOMEventHandler {
 
     static initializedListeners = {};
 
-    DOMEventHandler.isNativeEvent = function(eventName) {
+    static isNativeEvent(eventName) {
       return typeof document.body["on" + eventName] !== "undefined"
         ||
           /* Needed because otherwise not able to use mobile emulation in browser! */
         ['touchmove', 'touchstart', 'touchend'].includes(eventName)
-    };
+    }
 
     static addEventListener(id, element, type, callback){
       if(!DOMEventHandler.isNativeEvent(type)){
@@ -37,12 +37,12 @@ export default DOMEventHandler {
         return element.addEventListener(type, callback);
       }
       DOMBuffer.setAttribute(element, 'data-arvaid', id); //TODO see if this can be replaced by symbols for performance
-      var eventEmitter = DOMEventHandler.initializedListeners[type];
+      let eventEmitter = DOMEventHandler.initializedListeners[type];
       if(!eventEmitter){
         eventEmitter = DOMEventHandler.initializedListeners[type] = new EventEmitter();
         window.addEventListener(type, function (event) {
-          var target = event.relatedTarget || event.target;
-          var receivedID = target && target.getAttribute && target.getAttribute('data-arvaid');
+          let target = event.relatedTarget || event.target;
+          let receivedID = target && target.getAttribute && target.getAttribute('data-arvaid');
           if(receivedID){
             eventEmitter.emit(receivedID, event);
           }

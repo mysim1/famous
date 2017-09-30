@@ -101,7 +101,7 @@ export default class GenericSync {
       sync.unpipe(this._eventOutput);
   }
 
-  function _addSingleSync(key, options) {
+  _addSingleSync(key, options) {
       if (!registry[key]) return;
       let optionsToPassOn = options || this.options;
       this._syncs[key] = new (registry[key])(optionsToPassOn);
@@ -118,9 +118,9 @@ export default class GenericSync {
   addSync(syncs) {
       if (syncs instanceof Array)
           for (let i = 0; i < syncs.length; i++)
-              _addSingleSync.call(this, syncs[i]);
+              this._addSingleSync(syncs[i]);
       else if (syncs instanceof Object)
           for (let key in syncs)
-              _addSingleSync.call(this, key, syncs[key]);
+              this._addSingleSync(key, syncs[key]);
   }
 }

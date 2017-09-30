@@ -61,7 +61,7 @@ export default class ScrollSync {
     this._loopBound = false;
   }
 
-  ScrollSync.DEFAULT_OPTIONS = {
+  static DEFAULT_OPTIONS = {
     direction: undefined,
     minimumEndSpeed: Infinity,
     swapDirections: false,
@@ -75,10 +75,9 @@ export default class ScrollSync {
   static DIRECTION_X = 0;
   static DIRECTION_Y = 1;
   static MINIMUM_TICK_TIME = 8;
-  static _now = Date.now;
 
   _newFrame() {
-    if (this._inProgress && (_now() - this._prevTime) > this.options.stallTime) {
+    if (this._inProgress && (Date.now() - this._prevTime) > this.options.stallTime) {
       this._inProgress = false;
 
       let finalVel = (Math.abs(this._prevVel) >= this.options.minimumEndSpeed)
@@ -112,7 +111,7 @@ export default class ScrollSync {
       }
     }
 
-    let currTime = _now();
+    let currTime = Date.now();
     let prevTime = this._prevTime || currTime;
 
     let diffX, diffY;

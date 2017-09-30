@@ -79,5 +79,4 @@ export default KeyCodes = {
       SPACE: 32,
       SHIFT: 16,
       TAB: 9
-  }
 }

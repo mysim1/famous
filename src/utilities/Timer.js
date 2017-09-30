@@ -52,7 +52,7 @@ export default class Timer {
    *
    * @return {function} function passed in as parameter
    */
-  function _addTimerFunction(fn) {
+  _addTimerFunction(fn) {
       FamousEngine.on(_event, fn);
       return fn;
   }
@@ -71,7 +71,7 @@ export default class Timer {
    *
    * @return {function} function passed in as parameter
    */
-  function setInterval(fn, duration) {
+  static setInterval(fn, duration) {
       var t = FamousEngine.now();
       var callback = function() {
           var t2 = FamousEngine.now();
@@ -94,7 +94,7 @@ export default class Timer {
    *
    * @return {function} function passed in as parameter
    */
-  function after(fn, numTicks) {
+  static after(fn, numTicks) {
       if (numTicks === undefined) return undefined;
       var callback = function() {
           numTicks--;
@@ -117,7 +117,7 @@ export default class Timer {
    *
    * @return {function} function passed in as parameter
    */
-  function every(fn, numTicks) {
+  static every(fn, numTicks) {
       numTicks = numTicks || 1;
       var initial = numTicks;
       var callback = function() {
@@ -137,7 +137,7 @@ export default class Timer {
    *
    * @param {function} fn event linstener
    */
-  function clear(fn) {
+  static clear(fn) {
       FamousEngine.removeListener(_event, fn);
   }
 
@@ -152,7 +152,7 @@ export default class Timer {
    *
    * @return {function} function that is not able to debounce
    */
-  function debounce(func, wait) {
+  static debounce(func, wait) {
       var timeout;
       var ctx;
       var timestamp;

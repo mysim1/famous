@@ -9,7 +9,7 @@
  */
 
  import EventHandler from '../core/EventHandler.js';
- import TouchTracker from '../TouchTracker.js';
+ import TouchTracker from './TouchTracker.js';
  import OptionsManager from '../core/OptionsManager.js';
 
 export default class TouchSync {

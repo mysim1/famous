@@ -246,7 +246,7 @@ export default class StateModifier {
      * @method getFinalTransform
      * @return {Transform} transform matrix
      */
-    StateModifier.prototype.getFinalTransform = function getFinalTransform() {
+    getFinalTransform() {
         return this._transformState.getFinal();
     }
 

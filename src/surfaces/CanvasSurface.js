@@ -43,7 +43,7 @@ export default class CanvasSurface extends Surface {
    * @method setContent
    *
    */
-  CanvasSurface.prototype.setContent = function setContent() {console.warn('Cannot set content in a CanvasSurface')};
+  setContent() {console.warn('Cannot set content in a CanvasSurface')};
 
   /**
    * Place the document element this component manages into the document.

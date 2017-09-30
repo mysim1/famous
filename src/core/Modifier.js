@@ -8,11 +8,11 @@
  * this class to ES6 for purpose of unifying Arva's development environment.
  */
 
- import Transform                 from './Transform');
+ import Transform                 from './Transform';
 
  /* TODO: remove these dependencies when deprecation complete */
- import Transitionable            from '../transitions/Transitionable');
- import TransitionableTransform   from '../transitions/TransitionableTransform');
+ import Transitionable            from '../transitions/Transitionable';
+ import TransitionableTransform   from '../transitions/TransitionableTransform';
 
 export default class Modifier {
 

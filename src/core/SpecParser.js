@@ -85,7 +85,7 @@ export default class SpecParser {
       ];
   }
 
-  var _zeroZero = [0, 0];
+  static _zeroZero = [0, 0];
 
   // From the provided renderSpec tree, recursively compose opacities,
   //    origins, transforms, and sizes corresponding to each surface id from

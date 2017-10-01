@@ -12,7 +12,6 @@ import Surface from '../core/Surface.js';
 import CanvasSurface from '../surfaces/CanvasSurface.js';
 import EventHandler from '../core/EventHandler.js';
 import Transform from '../core/Transform.js';
-import EventHandler from '../core/EventHandler.js';
 import Utilities from '../math/Utilities.js';
 import OptionsManager from '../core/OptionsManager.js';
 
@@ -27,8 +26,6 @@ GenericSync.register({
 });
 
 export default class Slider {
-
-    Slider.with = Surface.with;
 
     /** @constructor */
     constructor(options) {
@@ -72,6 +69,10 @@ export default class Slider {
 
         this._drawPos = 0;
         this._updateLabel();
+    }
+
+    static with() {
+      return Surface.with(...arguments);
     }
 
     static DEFAULT_OPTIONS = {

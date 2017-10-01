@@ -60,11 +60,13 @@ export default class ToggleButton {
         if (options) this.setOptions(options);
     }
 
-    ToggleButton.with = Surface.with;
+    static with() {
+      return Surface.with(...arguments);
+    }
 
-    ToggleButton.OFF = 0;
-    ToggleButton.ON = 1;
-    ToggleButton.TOGGLE = 2;
+    static OFF = 0;
+    static ON = 1;
+    static TOGGLE = 2;
 
     /**
      * Transition towards the 'on' state and dispatch an event to
